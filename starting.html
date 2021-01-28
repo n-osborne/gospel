@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Starting Example &#8212; GOSPEL  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Example Tools" href="tools.html" />
+    <link rel="prev" title="Welcome to Gospel’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="starting-example">
+<h1>Starting Example<a class="headerlink" href="#starting-example" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">type</span> <span class="k">&#39;</span><span class="n">a</span> <span class="n">t</span>
+<span class="c">(*@ mutable model view: &#39;a seq *)</span>
+</pre></div>
+</div>
+<p>Foo bar.</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="n">push</span><span class="o">:</span> <span class="k">&#39;</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="k">&#39;</span><span class="n">a</span> <span class="n">t</span> <span class="o">-&gt;</span> <span class="kt">unit</span>
+<span class="c">(*@ push v q</span>
+<span class="c">    modifies q</span>
+<span class="c">    ensures  q.view = Seq.cons v (old q.view) *)</span>
+</pre></div>
+</div>
+<div class="section" id="gospel-type-checker">
+<h2>Gospel type-checker<a class="headerlink" href="#gospel-type-checker" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<ul class="simple">
+<li><p>show how the type-checker works for this example</p></li>
+<li><p>should we also show the use of the <cite>why3gospel</cite> plugin for this example?</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="cameleer">
+<h2>Cameleer<a class="headerlink" href="#cameleer" title="Permalink to this headline">¶</a></h2>
+<p>Cameleer is a tool for the deductive verification for OCaml code. It takes as
+input an OCaml programm, annotated with Gospel specification, and translates it
+into an equivalent WhyML counterpart.</p>
+<div class="admonition-todo admonition" id="id2">
+<p class="admonition-title">Todo</p>
+<p>include a more comprehensive introduction to the Cameleer tool</p>
+</div>
+<p>Following the Baker’s approach, we encode a queue using a pair of lists to store
+its elements. We begin by declaring the following type definition:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">type</span> <span class="k">&#39;</span><span class="n">a</span> <span class="n">t</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="k">mutable</span> <span class="n">front</span><span class="o">:</span> <span class="k">&#39;</span><span class="n">a</span> <span class="kt">list</span><span class="o">;</span>
+  <span class="k">mutable</span> <span class="n">rear</span> <span class="o">:</span> <span class="k">&#39;</span><span class="n">a</span> <span class="kt">list</span><span class="o">;</span>
+  <span class="k">mutable</span> <span class="n">size</span> <span class="o">:</span> <span class="kt">int</span><span class="o">;</span>
+  <span class="k">mutable</span> <span class="n">view</span> <span class="o">:</span> <span class="k">&#39;</span><span class="n">a</span> <span class="kt">list</span> <span class="o">[@</span><span class="n">ghost</span><span class="o">];</span>
+<span class="o">}</span> <span class="c">(*@ invariant size = length view *)</span>
+  <span class="c">(*@ invariant (front = [] -&gt; rear = []) &amp;&amp;</span>
+<span class="c">                view = front ++ List.rev rear *)</span>
+</pre></div>
+</div>
+<div class="admonition-todo admonition" id="id3">
+<p class="admonition-title">Todo</p>
+<p>change the type of field <cite>view</cite> to a sequence</p>
+</div>
+<p>This type is equipped with an invariant…</p>
+<p>Simple operations over queues, the <cite>create</cite> and <cite>is_empty</cite> functions, as
+follows:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">let</span> <span class="n">create</span> <span class="bp">()</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="n">front</span> <span class="o">=</span> <span class="bp">[]</span><span class="o">;</span>
+  <span class="n">rear</span>  <span class="o">=</span> <span class="bp">[]</span><span class="o">;</span>
+  <span class="n">size</span>  <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+  <span class="n">view</span>  <span class="o">=</span> <span class="bp">[]</span><span class="o">;</span>
+<span class="o">}</span> <span class="c">(*@ q = create ()</span>
+<span class="c">        ensures q.view = [] *)</span>
+
+<span class="k">let</span> <span class="o">[@</span><span class="n">logic</span><span class="o">]</span> <span class="n">is_empty</span> <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="c">(*@ b = is_empty q</span>
+<span class="c">      ensures b &lt;-&gt; q.view = [] *)</span>
+</pre></div>
+</div>
+<p>A more interesting function, the <cite>push</cite> …</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">let</span> <span class="n">push</span> <span class="n">x</span> <span class="n">q</span> <span class="o">=</span>
+  <span class="k">if</span> <span class="n">is_empty</span> <span class="n">q</span> <span class="k">then</span> <span class="n">q</span><span class="o">.</span><span class="n">front</span> <span class="o">&lt;-</span> <span class="o">[</span><span class="n">x</span><span class="o">]</span> <span class="k">else</span> <span class="n">q</span><span class="o">.</span><span class="n">rear</span> <span class="o">&lt;-</span> <span class="n">x</span> <span class="o">::</span> <span class="n">q</span><span class="o">.</span><span class="n">rear</span><span class="o">;</span>
+  <span class="n">q</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;-</span> <span class="n">q</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span>
+  <span class="n">q</span><span class="o">.</span><span class="n">view</span> <span class="o">&lt;-</span> <span class="n">q</span><span class="o">.</span><span class="n">view</span> <span class="o">@</span> <span class="o">(</span><span class="n">x</span> <span class="o">::</span> <span class="bp">[]</span><span class="o">)</span>
+<span class="c">(*@ push x q</span>
+<span class="c">      ensures q.view = (old q.view) @ [x] *)</span>
+</pre></div>
+</div>
+<div class="admonition-todo admonition" id="id4">
+<p class="admonition-title">Todo</p>
+<p>change the <cite>push</cite> operation to follow the queue model of the FM’19 paper</p>
+</div>
+</div>
+<div class="section" id="ocaml-rtac">
+<h2>OCaml RTAC<a class="headerlink" href="#ocaml-rtac" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition" id="id5">
+<p class="admonition-title">Todo</p>
+<p>use the ephemeral queue example to showcase Clément’s RTAC tool</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">GOSPEL</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Starting Example</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#gospel-type-checker">Gospel type-checker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cameleer">Cameleer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ocaml-rtac">OCaml RTAC</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Example Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="language.html">Language Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Gospel API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to Gospel’s documentation!</a></li>
+      <li>Next: <a href="tools.html" title="next chapter">Example Tools</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, VOCaL team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/starting.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

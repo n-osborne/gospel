@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Language Specification &#8212; GOSPEL  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Gospel API" href="api.html" />
+    <link rel="prev" title="Example Tools" href="tools.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="language-specification">
+<h1>Language Specification<a class="headerlink" href="#language-specification" title="Permalink to this headline">¶</a></h1>
+<p>Gospel annotations are inserted in interface files (<code class="docutils literal notranslate"><span class="pre">.mli</span></code>), using
+attributes <code class="docutils literal notranslate"><span class="pre">[&#64;&#64;gospel</span> <span class="pre">&quot;....&quot;]</span></code>.  Gospel comes with a preprocessor
+for the OCaml compiler that simplifies the writing of such a
+specification as <code class="docutils literal notranslate"><span class="pre">(*&#64;</span> <span class="pre">....</span> <span class="pre">*)</span></code>. We use the latter in the examples
+below.</p>
+<div class="section" id="lexical-conventions">
+<h2>Lexical Conventions<a class="headerlink" href="#lexical-conventions" title="Permalink to this headline">¶</a></h2>
+<p>Gospel uses the OCaml lexical conventions, with the following
+exceptions:</p>
+</div>
+<div class="section" id="terms-and-formulas">
+<h2>Terms and Formulas<a class="headerlink" href="#terms-and-formulas" title="Permalink to this headline">¶</a></h2>
+<pre>
+<strong id="grammar-token-term">term   </strong> ::=  <code class="xref docutils literal notranslate"><span class="pre">integer</span></code>   ; integer constant
+             | <code class="xref docutils literal notranslate"><span class="pre">real</span></code>   ; real constant
+             | &quot;true&quot; | &quot;false&quot;   ; Boolean constant
+             | <a class="reference internal" href="#grammar-token-term"><code class="xref docutils literal notranslate"><span class="pre">term</span></code></a> &quot;+&quot; <a class="reference internal" href="#grammar-token-term"><code class="xref docutils literal notranslate"><span class="pre">term</span></code></a>
+             | ..TODO..
+<strong id="grammar-token-formula">formula</strong> ::=  TODO
+<strong id="grammar-token-pattern">pattern</strong> ::=  TODO
+</pre>
+</div>
+<div class="section" id="function-contracts">
+<h2>Function Contracts<a class="headerlink" href="#function-contracts" title="Permalink to this headline">¶</a></h2>
+<p>An OCaml function is given a formal specification by appending one
+Gospel function contract to its declaration.  Here is an example:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="n">eucl_division</span><span class="o">:</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span> <span class="o">*</span> <span class="kt">int</span>
+<span class="c">(*@ q, r = eucl_division x y</span>
+<span class="c">    requires y &gt; 0</span>
+<span class="c">    ensures  x = q * y + r</span>
+<span class="c">    ensures  0 &lt;= r &lt; y *)</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>Such a contract is composed of two parts:</dt><dd><ul class="simple">
+<li><p>The first line is the header of the contract; it names the function
+arguments and result. It is mandatory and must appear at the
+beginning of the contract.</p></li>
+<li><p>The next lines contain as many specification <cite>clauses</cite> as
+needed. Here we have three clauses: one precondition introduced
+with <code class="docutils literal notranslate"><span class="pre">requires</span></code>, and two postconditions introduced with
+<code class="docutils literal notranslate"><span class="pre">ensures</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<pre>
+<strong id="grammar-token-contract">contract   </strong> ::=  <a class="reference internal" href="#grammar-token-header"><code class="xref docutils literal notranslate"><span class="pre">header</span></code></a> <a class="reference internal" href="#grammar-token-clause"><code class="xref docutils literal notranslate"><span class="pre">clause</span></code></a>*
+<strong id="grammar-token-header">header     </strong> ::=  (<a class="reference internal" href="#grammar-token-ident-tuple"><code class="xref docutils literal notranslate"><span class="pre">ident_tuple</span></code></a> &quot;=&quot;)? <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code> <a class="reference internal" href="#grammar-token-parameter"><code class="xref docutils literal notranslate"><span class="pre">parameter</span></code></a>+
+<strong id="grammar-token-clause">clause     </strong> ::=  &quot;requires&quot; <a class="reference internal" href="#grammar-token-formula"><code class="xref docutils literal notranslate"><span class="pre">formula</span></code></a>
+                 | &quot;checks&quot; <a class="reference internal" href="#grammar-token-formula"><code class="xref docutils literal notranslate"><span class="pre">formula</span></code></a>
+                 | &quot;ensures&quot; <a class="reference internal" href="#grammar-token-formula"><code class="xref docutils literal notranslate"><span class="pre">formula</span></code></a>
+                 | &quot;raises&quot; <a class="reference internal" href="#grammar-token-case"><code class="xref docutils literal notranslate"><span class="pre">case</span></code></a> (&quot;|&quot; <a class="reference internal" href="#grammar-token-case"><code class="xref docutils literal notranslate"><span class="pre">case</span></code></a>)*
+                 | &quot;modifies&quot; <a class="reference internal" href="#grammar-token-term"><code class="xref docutils literal notranslate"><span class="pre">term</span></code></a> (&quot;,&quot; <a class="reference internal" href="#grammar-token-term"><code class="xref docutils literal notranslate"><span class="pre">term</span></code></a>)*
+                 | &quot;equivalent&quot; <code class="xref docutils literal notranslate"><span class="pre">string</span></code>
+                 | &quot;diverges&quot;
+                 | &quot;consumes&quot;
+<strong id="grammar-token-case">case       </strong> ::=  <a class="reference internal" href="#grammar-token-pattern"><code class="xref docutils literal notranslate"><span class="pre">pattern</span></code></a> &quot;-&gt;&quot; <a class="reference internal" href="#grammar-token-formula"><code class="xref docutils literal notranslate"><span class="pre">formula</span></code></a>
+<strong id="grammar-token-ident-tuple">ident_tuple</strong> ::=  <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code> (&quot;,&quot; <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code>)*
+<strong id="grammar-token-parameter">parameter  </strong> ::=  &quot;()&quot; | <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code> | &quot;~&quot; <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code> | &quot;?&quot; <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code>
+</pre>
+<p class="rubric">Docstrings</p>
+<p>Note that Gospel annotations can be combined with traditional
+docstrings, e.g. as follows:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="n">eucl_division</span><span class="o">:</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span> <span class="o">*</span> <span class="kt">int</span>
+<span class="c">(** this is an implementation of Euclidean division *)</span>
+<span class="c">(*@ q, r = eucl_division x y ... *)</span>
+</pre></div>
+</div>
+<p class="rubric">Absence of contract</p>
+<div class="section" id="precondition-requires">
+<span id="index-0"></span><h3>Precondition (<code class="docutils literal notranslate"><span class="pre">requires</span></code>)<a class="headerlink" href="#precondition-requires" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">checks</span></code> variant</p>
+</div>
+<div class="section" id="postcondition-ensures">
+<span id="index-1"></span><h3>Postcondition (<code class="docutils literal notranslate"><span class="pre">ensures</span></code>)<a class="headerlink" href="#postcondition-ensures" title="Permalink to this headline">¶</a></h3>
+<p>here is an example:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="n">f</span><span class="o">:</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span>
+<span class="c">(*@ y = f x</span>
+<span class="c">    requires x &gt; 0 *)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="exceptional-postcondition-raises">
+<span id="index-2"></span><h3>Exceptional Postcondition (<code class="docutils literal notranslate"><span class="pre">raises</span></code>)<a class="headerlink" href="#exceptional-postcondition-raises" title="Permalink to this headline">¶</a></h3>
+<p>when multiple <code class="docutils literal notranslate"><span class="pre">raises</span></code> clauses are given, they are checked
+independently of each other</p>
+<p>each “raises” clause must perform an exhaustive pattern matching on
+its argument</p>
+</div>
+<div class="section" id="equivalent">
+<span id="index-3"></span><h3>Equivalent<a class="headerlink" href="#equivalent" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="non-termination">
+<span id="index-4"></span><h3>Non termination<a class="headerlink" href="#non-termination" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="index-5"></span></div>
+<div class="section" id="effects">
+<span id="index-6"></span><h3>Effects<a class="headerlink" href="#effects" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">modifies</span></code>…
+<code class="docutils literal notranslate"><span class="pre">consumes</span></code>…</p>
+<span class="target" id="index-7"></span><span class="target" id="index-8"></span><span class="target" id="index-9"></span></div>
+</div>
+<div class="section" id="type-specification">
+<span id="index-10"></span><h2>Type Specification<a class="headerlink" href="#type-specification" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="index-11"></span><span class="target" id="index-12"></span><span class="target" id="index-13"></span></div>
+<div class="section" id="ghost-and-logical-declarations">
+<span id="index-14"></span><h2>Ghost and Logical Declarations<a class="headerlink" href="#ghost-and-logical-declarations" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">GOSPEL</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="starting.html">Starting Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Example Tools</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Language Specification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#lexical-conventions">Lexical Conventions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#terms-and-formulas">Terms and Formulas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#function-contracts">Function Contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#type-specification">Type Specification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ghost-and-logical-declarations">Ghost and Logical Declarations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Gospel API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="tools.html" title="previous chapter">Example Tools</a></li>
+      <li>Next: <a href="api.html" title="next chapter">Gospel API</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, VOCaL team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/language.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
