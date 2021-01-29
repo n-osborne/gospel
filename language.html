@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Language Specification &#8212; GOSPEL  documentation</title>
+    <title>Language Specification &#8212; GOSPEL dev documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -12,6 +12,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Gospel API" href="api.html" />
@@ -34,32 +35,43 @@
             
   <div class="section" id="language-specification">
 <h1>Language Specification<a class="headerlink" href="#language-specification" title="Permalink to this headline">¶</a></h1>
-<p>Gospel annotations are inserted in interface files (<code class="docutils literal notranslate"><span class="pre">.mli</span></code>), using
-attributes <code class="docutils literal notranslate"><span class="pre">[&#64;&#64;gospel</span> <span class="pre">&quot;....&quot;]</span></code>.  Gospel comes with a preprocessor
-for the OCaml compiler that simplifies the writing of such a
-specification as <code class="docutils literal notranslate"><span class="pre">(*&#64;</span> <span class="pre">....</span> <span class="pre">*)</span></code>. We use the latter in the examples
-below.</p>
+<p>Gospel annotations are inserted in interface files (<code class="docutils literal notranslate"><span class="pre">.mli</span></code>), using attributes
+<code class="docutils literal notranslate"><span class="pre">[&#64;&#64;gospel</span> <span class="pre">&quot;....&quot;]</span></code>. Gospel comes with a preprocessor for the OCaml compiler
+that simplifies the writing of such a specification as <code class="docutils literal notranslate"><span class="pre">(*&#64;</span> <span class="pre">....</span> <span class="pre">*)</span></code>. We use
+the latter in the examples below.</p>
 <div class="section" id="lexical-conventions">
 <h2>Lexical Conventions<a class="headerlink" href="#lexical-conventions" title="Permalink to this headline">¶</a></h2>
 <p>Gospel uses the OCaml lexical conventions, with the following
 exceptions:</p>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>Define lexical conventions</p>
+</div>
 </div>
 <div class="section" id="terms-and-formulas">
 <h2>Terms and Formulas<a class="headerlink" href="#terms-and-formulas" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition" id="id2">
+<p class="admonition-title">Todo</p>
+<p>Define terms and formulas - this is just a placeholder</p>
+</div>
 <pre>
 <strong id="grammar-token-term">term   </strong> ::=  <code class="xref docutils literal notranslate"><span class="pre">integer</span></code>   ; integer constant
              | <code class="xref docutils literal notranslate"><span class="pre">real</span></code>   ; real constant
              | &quot;true&quot; | &quot;false&quot;   ; Boolean constant
              | <a class="reference internal" href="#grammar-token-term"><code class="xref docutils literal notranslate"><span class="pre">term</span></code></a> &quot;+&quot; <a class="reference internal" href="#grammar-token-term"><code class="xref docutils literal notranslate"><span class="pre">term</span></code></a>
-             | ..TODO..
+             | TODO
 <strong id="grammar-token-formula">formula</strong> ::=  TODO
 <strong id="grammar-token-pattern">pattern</strong> ::=  TODO
 </pre>
 </div>
 <div class="section" id="function-contracts">
 <h2>Function Contracts<a class="headerlink" href="#function-contracts" title="Permalink to this headline">¶</a></h2>
-<p>An OCaml function is given a formal specification by appending one
-Gospel function contract to its declaration.  Here is an example:</p>
+<div class="admonition-todo admonition" id="id3">
+<p class="admonition-title">Todo</p>
+<p>contracta for a constant e.g. val x: int (header needed? etc.)</p>
+</div>
+<p>An OCaml function is given a formal specification by appending one Gospel
+function contract to its declaration. Here is an example:</p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="n">eucl_division</span><span class="o">:</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span> <span class="o">*</span> <span class="kt">int</span>
 <span class="c">(*@ q, r = eucl_division x y</span>
 <span class="c">    requires y &gt; 0</span>
@@ -69,12 +81,11 @@ Gospel function contract to its declaration.  Here is an example:</p>
 </div>
 <dl class="simple">
 <dt>Such a contract is composed of two parts:</dt><dd><ul class="simple">
-<li><p>The first line is the header of the contract; it names the function
-arguments and result. It is mandatory and must appear at the
-beginning of the contract.</p></li>
-<li><p>The next lines contain as many specification <cite>clauses</cite> as
-needed. Here we have three clauses: one precondition introduced
-with <code class="docutils literal notranslate"><span class="pre">requires</span></code>, and two postconditions introduced with
+<li><p>The first line is the header of the contract; it names the function arguments
+and result. It is mandatory and must appear at the beginning of the contract.</p></li>
+<li><p>The next lines contain as many specification <cite>clauses</cite> as needed. Here we
+have three clauses: one <a class="reference internal" href="#preconditions"><span class="std std-ref">precondition</span></a> introduced with
+<code class="docutils literal notranslate"><span class="pre">requires</span></code>, and two <a class="reference internal" href="#postconditions"><span class="std std-ref">postconditions</span></a>” introduced with
 <code class="docutils literal notranslate"><span class="pre">ensures</span></code>.</p></li>
 </ul>
 </dd>
@@ -82,64 +93,214 @@ with <code class="docutils literal notranslate"><span class="pre">requires</span
 <pre>
 <strong id="grammar-token-contract">contract   </strong> ::=  <a class="reference internal" href="#grammar-token-header"><code class="xref docutils literal notranslate"><span class="pre">header</span></code></a> <a class="reference internal" href="#grammar-token-clause"><code class="xref docutils literal notranslate"><span class="pre">clause</span></code></a>*
 <strong id="grammar-token-header">header     </strong> ::=  (<a class="reference internal" href="#grammar-token-ident-tuple"><code class="xref docutils literal notranslate"><span class="pre">ident_tuple</span></code></a> &quot;=&quot;)? <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code> <a class="reference internal" href="#grammar-token-parameter"><code class="xref docutils literal notranslate"><span class="pre">parameter</span></code></a>+
-<strong id="grammar-token-clause">clause     </strong> ::=  &quot;requires&quot; <a class="reference internal" href="#grammar-token-formula"><code class="xref docutils literal notranslate"><span class="pre">formula</span></code></a>
-                 | &quot;checks&quot; <a class="reference internal" href="#grammar-token-formula"><code class="xref docutils literal notranslate"><span class="pre">formula</span></code></a>
-                 | &quot;ensures&quot; <a class="reference internal" href="#grammar-token-formula"><code class="xref docutils literal notranslate"><span class="pre">formula</span></code></a>
-                 | &quot;raises&quot; <a class="reference internal" href="#grammar-token-case"><code class="xref docutils literal notranslate"><span class="pre">case</span></code></a> (&quot;|&quot; <a class="reference internal" href="#grammar-token-case"><code class="xref docutils literal notranslate"><span class="pre">case</span></code></a>)*
+<strong id="grammar-token-clause">clause     </strong> ::=  <code class="xref docutils literal notranslate"><span class="pre">precondtion</span></code>
+                 | <a class="reference internal" href="#grammar-token-postcondition"><code class="xref docutils literal notranslate"><span class="pre">postcondition</span></code></a>
+                 | <a class="reference internal" href="#grammar-token-exceptional-postcondition"><code class="xref docutils literal notranslate"><span class="pre">exceptional_postcondition</span></code></a>
                  | &quot;modifies&quot; <a class="reference internal" href="#grammar-token-term"><code class="xref docutils literal notranslate"><span class="pre">term</span></code></a> (&quot;,&quot; <a class="reference internal" href="#grammar-token-term"><code class="xref docutils literal notranslate"><span class="pre">term</span></code></a>)*
                  | &quot;equivalent&quot; <code class="xref docutils literal notranslate"><span class="pre">string</span></code>
                  | &quot;diverges&quot;
                  | &quot;consumes&quot;
-<strong id="grammar-token-case">case       </strong> ::=  <a class="reference internal" href="#grammar-token-pattern"><code class="xref docutils literal notranslate"><span class="pre">pattern</span></code></a> &quot;-&gt;&quot; <a class="reference internal" href="#grammar-token-formula"><code class="xref docutils literal notranslate"><span class="pre">formula</span></code></a>
 <strong id="grammar-token-ident-tuple">ident_tuple</strong> ::=  <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code> (&quot;,&quot; <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code>)*
 <strong id="grammar-token-parameter">parameter  </strong> ::=  &quot;()&quot; | <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code> | &quot;~&quot; <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code> | &quot;?&quot; <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code>
 </pre>
+<div class="admonition-todo admonition" id="id4">
+<p class="admonition-title">Todo</p>
+<p>ghost parameters and results</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the absence of a contract attached to a function declaration, <strong>no
+assumptions are made</strong> on the behaviour of the function.</p>
+<p>No preconditions or postconditions are to be verified, and the function may
+diverge, raise unlisted exceptions, or modify mutable types, etc.</p>
+<p>One may still enable the implicit specification about exceptions,
+mutability, non-termination, etc. by creating a contract with no clause:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="n">eucl_division</span><span class="o">:</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span> <span class="o">*</span> <span class="kt">int</span>
+<span class="c">(*@ q, r = eucl_division x y *)</span>
+</pre></div>
+</div>
+</div>
 <p class="rubric">Docstrings</p>
-<p>Note that Gospel annotations can be combined with traditional
-docstrings, e.g. as follows:</p>
+<p>Note that Gospel annotations can be combined with traditional docstrings, e.g.
+as follows:</p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="n">eucl_division</span><span class="o">:</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span> <span class="o">*</span> <span class="kt">int</span>
 <span class="c">(** this is an implementation of Euclidean division *)</span>
 <span class="c">(*@ q, r = eucl_division x y ... *)</span>
 </pre></div>
 </div>
-<p class="rubric">Absence of contract</p>
-<div class="section" id="precondition-requires">
-<span id="index-0"></span><h3>Precondition (<code class="docutils literal notranslate"><span class="pre">requires</span></code>)<a class="headerlink" href="#precondition-requires" title="Permalink to this headline">¶</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">checks</span></code> variant</p>
+<span class="target" id="index-0"></span><div class="section" id="preconditions">
+<span id="index-1"></span><h3>Preconditions<a class="headerlink" href="#preconditions" title="Permalink to this headline">¶</a></h3>
+<p>Preconditions are properties that are expected to be verified <em>before</em> the
+function call. They are usually used to describe the expected inputs of the
+function, but may also relate to a global state.</p>
+<p>They denoted using the keyword <code class="docutils literal notranslate"><span class="pre">requires</span></code> or <code class="docutils literal notranslate"><span class="pre">checks</span></code>, followed by a
+<a class="reference internal" href="#grammar-token-formula"><code class="xref std std-token docutils literal notranslate"><span class="pre">formula</span></code></a>:</p>
+<pre>
+<strong id="grammar-token-precondition">precondition</strong> ::=  &quot;requires&quot; <a class="reference internal" href="#grammar-token-formula"><code class="xref docutils literal notranslate"><span class="pre">formula</span></code></a>
+                  | &quot;checks&quot; <a class="reference internal" href="#grammar-token-formula"><code class="xref docutils literal notranslate"><span class="pre">formula</span></code></a>
+</pre>
+<p class="rubric"><code class="docutils literal notranslate"><span class="pre">requires</span></code></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">requires</span></code> clauses state the conditions for which the specified function
+has a well specified behaviour. They unlock the other informations provided by
+the specification (postconditions, exceptions, effects, etc.).</p>
+<p>In our previous example, the precondition <span class="math notranslate nohighlight">\(y &gt; 0\)</span> is required to ensure the
+correct behaviour of the function:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="n">eucl_division</span><span class="o">:</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span> <span class="o">*</span> <span class="kt">int</span>
+<span class="c">(*@ q, r = eucl_division x y</span>
+<span class="hll"><span class="c">    requires y &gt; 0</span>
+</span><span class="c">    ... *)</span>
+</pre></div>
 </div>
-<div class="section" id="postcondition-ensures">
-<span id="index-1"></span><h3>Postcondition (<code class="docutils literal notranslate"><span class="pre">ensures</span></code>)<a class="headerlink" href="#postcondition-ensures" title="Permalink to this headline">¶</a></h3>
-<p>here is an example:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="n">f</span><span class="o">:</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span>
-<span class="c">(*@ y = f x</span>
-<span class="c">    requires x &gt; 0 *)</span>
+<p>Whenever a <code class="docutils literal notranslate"><span class="pre">requires</span></code> precondition is violated during a call to the function,
+the behaviour of the function becomes unspecified, and the call should be
+considered faulty.</p>
+<p class="rubric"><code class="docutils literal notranslate"><span class="pre">checks</span></code></p>
+<p>Similarly to the <code class="docutils literal notranslate"><span class="pre">requires</span></code> clauses, <code class="docutils literal notranslate"><span class="pre">checks</span></code> preconditions should be
+verified in the state of the environment prior to the function call.</p>
+<p>However, unlike <code class="docutils literal notranslate"><span class="pre">requires</span></code> clauses, the behaviour of the function is specified
+in case such a precondition is violated, and the function must <em>fail</em> by raising
+an OCaml <code class="docutils literal notranslate"><span class="pre">Invalid_argument</span></code> exception immediately, and before modifying any
+existing state; the prestate is left strictly unchanged. In that case, the call
+is not considered faulty, but the caller is now in charge of handling the
+exception.</p>
+<p>The same function contract, where <code class="docutils literal notranslate"><span class="pre">requires</span></code> is replaced with <code class="docutils literal notranslate"><span class="pre">checks</span></code>,
+states that the function should raise <code class="docutils literal notranslate"><span class="pre">Invalid_argument</span></code> whenever <span class="math notranslate nohighlight">\(y
+\leq 0\)</span>.</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="n">eucl_division</span><span class="o">:</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span> <span class="o">*</span> <span class="kt">int</span>
+<span class="c">(*@ q, r = eucl_division x y</span>
+<span class="hll"><span class="c">    checks y &gt; 0</span>
+</span><span class="c">    ... *)</span>
+</pre></div>
+</div>
+<p class="rubric">Multiple preconditions</p>
+<p>Whenever multiple preconditions of the same kind are provided, they must be
+independently verified, in a conjunction, which means:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="o">...:</span> <span class="o">...</span>
+<span class="c">(*@ ...</span>
+<span class="c">     requires P</span>
+<span class="c">     requires Q *)</span>
+</pre></div>
+</div>
+<p>is equivalent to:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="o">...:</span> <span class="o">...</span>
+<span class="c">(*@ ...</span>
+<span class="c">     requires P /\ Q *)</span>
+</pre></div>
+</div>
+<p>However, splitting the specification of the prestate into smaller properties
+leads to better readability and maintainability and is generally encouraged.</p>
+</div>
+<div class="section" id="postconditions">
+<span id="index-2"></span><h3>Postconditions<a class="headerlink" href="#postconditions" title="Permalink to this headline">¶</a></h3>
+<p>Postconditions are properties that are expected to be verified <em>after</em> a valid
+function call. They are mostly used to specify how the outputs of the function
+relate to its inputs, and how values where mutated, when applicable.</p>
+<p>They are denoted using the <code class="docutils literal notranslate"><span class="pre">ensures</span></code>, followed by a <a class="reference internal" href="#grammar-token-formula"><code class="xref std std-token docutils literal notranslate"><span class="pre">formula</span></code></a>:</p>
+<pre>
+<strong id="grammar-token-postcondition">postcondition</strong> ::=  &quot;ensures&quot; <a class="reference internal" href="#grammar-token-formula"><code class="xref docutils literal notranslate"><span class="pre">formula</span></code></a>
+</pre>
+<p>Of course, as discussed in the <a class="reference internal" href="#preconditions"><span class="std std-ref">previous section</span></a>, the
+property expressed by the formula is expected to be verified after the function
+call only if the preconditions have been verified.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When an exception is raised, the postconditions are <strong>not</strong> expected to be
+verified, and the prestate must be left unchanged by the call, unless
+specified otherwise in an <a class="reference internal" href="#exceptional-postconditions"><span class="std std-ref">exceptional postcondition</span></a>.</p>
+</div>
+<p class="rubric">Multiple postconditions</p>
+<p>The handling of multiple postconditions is identical to preconditions; multiple
+postconditions can be merged with a conjunction:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="o">...:</span> <span class="o">...</span>
+<span class="c">(*@ ...</span>
+<span class="c">     ensures P</span>
+<span class="c">     ensures Q *)</span>
+</pre></div>
+</div>
+<p>is equivalent to:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="o">...:</span> <span class="o">...</span>
+<span class="c">(*@ ...</span>
+<span class="c">     ensures P /\ Q *)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="exceptional-postcondition-raises">
-<span id="index-2"></span><h3>Exceptional Postcondition (<code class="docutils literal notranslate"><span class="pre">raises</span></code>)<a class="headerlink" href="#exceptional-postcondition-raises" title="Permalink to this headline">¶</a></h3>
-<p>when multiple <code class="docutils literal notranslate"><span class="pre">raises</span></code> clauses are given, they are checked
-independently of each other</p>
-<p>each “raises” clause must perform an exhaustive pattern matching on
-its argument</p>
+<div class="section" id="exceptional-postconditions">
+<span id="index-3"></span><h3>Exceptional postconditions<a class="headerlink" href="#exceptional-postconditions" title="Permalink to this headline">¶</a></h3>
+<p>Exceptional postconditions are used to specify the exceptions that can be raised
+by the function. When no such clause is provided, the function should not raise
+any exceptions, and doing so is considered a violation of the specification.
+Whenever a function can raise an exception as part of its expected behaviour,
+this exception must be listed, along with the properties that are verified in
+that case.</p>
+<p>Thses clauses are expressed with a <code class="docutils literal notranslate"><span class="pre">raises</span></code> keyword, followed by a list of
+<a class="reference internal" href="#grammar-token-case"><code class="xref std std-token docutils literal notranslate"><span class="pre">cases</span></code></a> associating each exception with its <a class="reference internal" href="#grammar-token-formula"><code class="xref std std-token docutils literal notranslate"><span class="pre">formula</span></code></a>
+exceptions to be matched, in a syntax similar to OCaml:</p>
+<pre>
+<strong id="grammar-token-exceptional-postcondition">exceptional_postcondition</strong> ::=  &quot;raises&quot; <a class="reference internal" href="#grammar-token-case"><code class="xref docutils literal notranslate"><span class="pre">case</span></code></a> (&quot;|&quot; <a class="reference internal" href="#grammar-token-case"><code class="xref docutils literal notranslate"><span class="pre">case</span></code></a>)*
+<strong id="grammar-token-case">case                     </strong> ::=  <a class="reference internal" href="#grammar-token-pattern"><code class="xref docutils literal notranslate"><span class="pre">pattern</span></code></a> &quot;-&gt;&quot; <a class="reference internal" href="#grammar-token-formula"><code class="xref docutils literal notranslate"><span class="pre">formula</span></code></a>
+</pre>
+<p>Gospel expects <code class="docutils literal notranslate"><span class="pre">raises</span></code> clauses to perform an exhaustive patterm matching each
+exception’s arguments. Similarly to OCaml’s pattern matchings, when an exception
+is raised, the postcondition to be verified is the first one being matched in
+the list of the cases.</p>
+<p class="rubric">Multiple exceptional postconditions</p>
+<p>When multiple such clauses are given, they are checked independently of each
+other, meaning that the raised exception is matched against each <code class="docutils literal notranslate"><span class="pre">raises</span></code>’s
+case list, and each matching pattern’s postcondition must be verified in
+conjunction.</p>
+<div class="admonition-todo admonition" id="id5">
+<p class="admonition-title">Todo</p>
+<p>Give an example here</p>
 </div>
-<div class="section" id="equivalent">
-<span id="index-3"></span><h3>Equivalent<a class="headerlink" href="#equivalent" title="Permalink to this headline">¶</a></h3>
+<p class="rubric">Exemptions</p>
+<p>Highly environment dependent exceptions are not expected to be listed, because
+they could be unexpectedly triggered depending on the specifics of the machine
+the code is executed on.</p>
+<p>There are two such exceptions in OCaml: <cite>Stack_overflow</cite> and <cite>Out_of_memory</cite>.
+For convenience, these are always assumed to be possibly raised by any
+function, without an explicit statement needed. This is equivalent to adding a
+<code class="docutils literal notranslate"><span class="pre">raises</span> <span class="pre">Out_of_memory</span> <span class="pre">|</span> <span class="pre">Stack_overflow</span> <span class="pre">-&gt;</span> <span class="pre">true</span></code> clause to every function
+contract.</p>
+<p>Of course, one may still override that behaviour by stating a property whenever
+these exceptions are raised, like any other exception.</p>
+</div>
+<div class="section" id="code-equivalence">
+<span id="index-4"></span><h3>Code equivalence<a class="headerlink" href="#code-equivalence" title="Permalink to this headline">¶</a></h3>
+<div class="admonition-todo admonition" id="id6">
+<p class="admonition-title">Todo</p>
+<p>do it</p>
+</div>
 </div>
 <div class="section" id="non-termination">
-<span id="index-4"></span><h3>Non termination<a class="headerlink" href="#non-termination" title="Permalink to this headline">¶</a></h3>
-<span class="target" id="index-5"></span></div>
+<span id="index-5"></span><h3>Non termination<a class="headerlink" href="#non-termination" title="Permalink to this headline">¶</a></h3>
+<div class="admonition-todo admonition" id="id7">
+<p class="admonition-title">Todo</p>
+<p>do it</p>
+</div>
+<span class="target" id="index-6"></span></div>
 <div class="section" id="effects">
-<span id="index-6"></span><h3>Effects<a class="headerlink" href="#effects" title="Permalink to this headline">¶</a></h3>
+<span id="index-7"></span><h3>Effects<a class="headerlink" href="#effects" title="Permalink to this headline">¶</a></h3>
+<div class="admonition-todo admonition" id="id8">
+<p class="admonition-title">Todo</p>
+<p>do it</p>
+</div>
 <p><code class="docutils literal notranslate"><span class="pre">modifies</span></code>…
 <code class="docutils literal notranslate"><span class="pre">consumes</span></code>…</p>
-<span class="target" id="index-7"></span><span class="target" id="index-8"></span><span class="target" id="index-9"></span></div>
+<span class="target" id="index-8"></span><span class="target" id="index-9"></span><span class="target" id="index-10"></span></div>
 </div>
 <div class="section" id="type-specification">
-<span id="index-10"></span><h2>Type Specification<a class="headerlink" href="#type-specification" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="index-11"></span><span class="target" id="index-12"></span><span class="target" id="index-13"></span></div>
+<span id="index-11"></span><h2>Type Specification<a class="headerlink" href="#type-specification" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition" id="id9">
+<p class="admonition-title">Todo</p>
+<p>do it</p>
+</div>
+<span class="target" id="index-12"></span><span class="target" id="index-13"></span><span class="target" id="index-14"></span></div>
 <div class="section" id="ghost-and-logical-declarations">
-<span id="index-14"></span><h2>Ghost and Logical Declarations<a class="headerlink" href="#ghost-and-logical-declarations" title="Permalink to this headline">¶</a></h2>
+<span id="index-15"></span><h2>Ghost and Logical Declarations<a class="headerlink" href="#ghost-and-logical-declarations" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition" id="id10">
+<p class="admonition-title">Todo</p>
+<p>do it</p>
+</div>
 </div>
 </div>
 
@@ -173,6 +334,7 @@ its argument</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Gospel API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="todos.html">Documentation TODOs</a></li>
 </ul>
 
 <div class="relations">
