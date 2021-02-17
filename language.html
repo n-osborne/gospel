@@ -36,7 +36,8 @@
   <div class="section" id="language-specification">
 <h1>Language Specification<a class="headerlink" href="#language-specification" title="Permalink to this headline">¶</a></h1>
 <p>Gospel annotations are inserted in interface files (<code class="docutils literal notranslate"><span class="pre">.mli</span></code>), using attributes
-<code class="docutils literal notranslate"><span class="pre">[&#64;&#64;gospel</span> <span class="pre">&quot;....&quot;]</span></code>. Gospel comes with a preprocessor for the OCaml compiler
+<code class="docutils literal notranslate"><span class="pre">[&#64;&#64;gospel</span> <span class="pre">&quot;....&quot;]</span></code> or <code class="docutils literal notranslate"><span class="pre">[&#64;&#64;&#64;gospel</span> <span class="pre">&quot;....&quot;]</span></code>.
+Gospel comes with a preprocessor for the OCaml compiler
 that simplifies the writing of such a specification as <code class="docutils literal notranslate"><span class="pre">(*&#64;</span> <span class="pre">....</span> <span class="pre">*)</span></code>. We use
 the latter in the examples below.</p>
 <div class="section" id="lexical-conventions">
@@ -97,7 +98,7 @@ have three clauses: one <a class="reference internal" href="#preconditions"><spa
 <pre>
 <strong id="grammar-token-contract">contract   </strong> ::=  <a class="reference internal" href="#grammar-token-header"><code class="xref docutils literal notranslate"><span class="pre">header</span></code></a> <a class="reference internal" href="#grammar-token-clause"><code class="xref docutils literal notranslate"><span class="pre">clause</span></code></a>*
 <strong id="grammar-token-header">header     </strong> ::=  (<a class="reference internal" href="#grammar-token-ident-tuple"><code class="xref docutils literal notranslate"><span class="pre">ident_tuple</span></code></a> &quot;=&quot;)? <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code> <a class="reference internal" href="#grammar-token-parameter"><code class="xref docutils literal notranslate"><span class="pre">parameter</span></code></a>+
-<strong id="grammar-token-clause">clause     </strong> ::=  <code class="xref docutils literal notranslate"><span class="pre">precondtion</span></code>
+<strong id="grammar-token-clause">clause     </strong> ::=  <a class="reference internal" href="#grammar-token-precondition"><code class="xref docutils literal notranslate"><span class="pre">precondition</span></code></a>
                  | <a class="reference internal" href="#grammar-token-postcondition"><code class="xref docutils literal notranslate"><span class="pre">postcondition</span></code></a>
                  | <a class="reference internal" href="#grammar-token-exceptional-postcondition"><code class="xref docutils literal notranslate"><span class="pre">exceptional_postcondition</span></code></a>
                  | &quot;modifies&quot; <a class="reference internal" href="#grammar-token-term"><code class="xref docutils literal notranslate"><span class="pre">term</span></code></a> (&quot;,&quot; <a class="reference internal" href="#grammar-token-term"><code class="xref docutils literal notranslate"><span class="pre">term</span></code></a>)*
