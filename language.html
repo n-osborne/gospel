@@ -35,11 +35,55 @@
             
   <div class="section" id="language-specification">
 <h1>Language Specification<a class="headerlink" href="#language-specification" title="Permalink to this headline">¶</a></h1>
-<p>Gospel annotations are inserted in interface files (<code class="docutils literal notranslate"><span class="pre">.mli</span></code>), using attributes
-<code class="docutils literal notranslate"><span class="pre">[&#64;&#64;gospel</span> <span class="pre">&quot;....&quot;]</span></code> or <code class="docutils literal notranslate"><span class="pre">[&#64;&#64;&#64;gospel</span> <span class="pre">&quot;....&quot;]</span></code>.
-Gospel comes with a preprocessor for the OCaml compiler
-that simplifies the writing of such a specification as <code class="docutils literal notranslate"><span class="pre">(*&#64;</span> <span class="pre">....</span> <span class="pre">*)</span></code>. We use
-the latter in the examples below.</p>
+<div class="section" id="specification-locations">
+<h2>Specification locations<a class="headerlink" href="#specification-locations" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="general-conventions">
+<h3>General conventions<a class="headerlink" href="#general-conventions" title="Permalink to this headline">¶</a></h3>
+<p>Gospel annotations are written in interface files (<code class="docutils literal notranslate"><span class="pre">.mli</span></code>).</p>
+<p><span class="xref std std-ref">OCaml attributes</span> with the
+identifier <cite>gospel</cite> are used to bear the Gospel specifications in their payload,
+as strings: <code class="docutils literal notranslate"><span class="pre">[&#64;&#64;gospel</span> <span class="pre">&quot;&lt;spec&gt;&quot;]</span></code> or <code class="docutils literal notranslate"><span class="pre">[&#64;&#64;&#64;gospel</span> <span class="pre">&quot;&lt;spec&gt;&quot;]</span></code>.</p>
+<p class="rubric">Floating attributes</p>
+<p><a class="reference internal" href="#ghost-and-logical-declarations"><span class="std std-ref">Gost and logical declarations</span></a> must lie
+in floating attributes, inside module signatures:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">[@@@</span><span class="n">gospel</span> <span class="s2">&quot;val f : int -&gt; int&quot;</span><span class="o">]</span>
+<span class="o">[@@@</span><span class="n">gospel</span> <span class="s2">&quot;predicate is_zero (x: integer) = x = 0&quot;</span><span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Attached attributes</p>
+<p>Specification bits which are semantically attached to OCaml declarations, e.g.
+<a class="reference internal" href="#function-contracts"><span class="std std-ref">function contracts</span></a> or <a class="reference internal" href="#type-specification"><span class="std std-ref">type specifications</span></a> specifications. In that case, the Gospel specification
+should be written in an attached attribute, following OCaml’s attachement rules:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="n">f</span><span class="o">:</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span>
+<span class="o">[@@</span><span class="n">gospel</span> <span class="s2">&quot;y = f x ensures x &gt; 0&quot;</span><span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Specification of ghost and logical Declarations</p>
+<p>When ghost and logical declarations need to be specified with a contract, the
+contract should reside in an attribute attached to the string containing the
+declaration:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">[@@@</span><span class="n">gospel</span> <span class="s2">&quot;val f : int -&gt; int&quot;</span>
+  <span class="o">[@@</span><span class="n">gospel</span> <span class="s2">&quot;y = f x ensures x &gt; 0&quot;</span><span class="o">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="gospel-preprocessor-gospel-pps">
+<h3>Gospel preprocessor: =gospel_pps=<a class="headerlink" href="#gospel-preprocessor-gospel-pps" title="Permalink to this headline">¶</a></h3>
+<p>Writing attributes can be tedious, especially when nested. Gospel is provided
+with a preprocessor that lets you write Gospel specifications in special
+comments, starting with a <code class="docutils literal notranslate"><span class="pre">&#64;</span></code>:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="n">f</span><span class="o">:</span> <span class="kt">int</span> <span class="o">-&gt;</span> <span class="kt">int</span>           <span class="c">(* An OCaml value declaration *)</span>
+<span class="c">(*@ y = f x                 (* Its Gospel specification   *)</span>
+<span class="c">    ensures x &gt; 0 *)</span>
+
+<span class="c">(*@ type t *)</span>               <span class="c">(* A ghost type declaration   *)</span>
+<span class="c">(*@ model size: int *)</span>      <span class="c">(* Its Gospel specification   *)</span>
+</pre></div>
+</div>
+<p>This notation will be used throughout the documentation, in place of the
+attribute-based one.</p>
+</div>
+</div>
 <div class="section" id="lexical-conventions">
 <h2>Lexical Conventions<a class="headerlink" href="#lexical-conventions" title="Permalink to this headline">¶</a></h2>
 <p>Gospel uses the OCaml lexical conventions, with the following
@@ -362,6 +406,7 @@ modifies applies for both ensures and raises</p>
 <li class="toctree-l1"><a class="reference internal" href="starting.html">Starting Example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tools.html">Example Tools</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Language Specification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#specification-locations">Specification locations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#lexical-conventions">Lexical Conventions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#terms-and-formulas">Terms and Formulas</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#function-contracts">Function Contracts</a></li>
