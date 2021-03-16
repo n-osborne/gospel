@@ -44,7 +44,7 @@
 identifier <cite>gospel</cite> are used to bear the Gospel specifications in their payload,
 as strings: <code class="docutils literal notranslate"><span class="pre">[&#64;&#64;gospel</span> <span class="pre">&quot;&lt;spec&gt;&quot;]</span></code> or <code class="docutils literal notranslate"><span class="pre">[&#64;&#64;&#64;gospel</span> <span class="pre">&quot;&lt;spec&gt;&quot;]</span></code>.</p>
 <p class="rubric">Floating attributes</p>
-<p><a class="reference internal" href="#ghost-and-logical-declarations"><span class="std std-ref">Gost and logical declarations</span></a> must lie
+<p><a class="reference internal" href="#ghost-and-logical-declarations"><span class="std std-ref">Ghost and logical declarations</span></a> must lie
 in floating attributes, inside module signatures:</p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">[@@@</span><span class="n">gospel</span> <span class="s2">&quot;val f : int -&gt; int&quot;</span><span class="o">]</span>
 <span class="o">[@@@</span><span class="n">gospel</span> <span class="s2">&quot;predicate is_zero (x: integer) = x = 0&quot;</span><span class="o">]</span>
@@ -68,7 +68,7 @@ declaration:</p>
 </div>
 </div>
 <div class="section" id="gospel-preprocessor-gospel-pps">
-<h3>Gospel preprocessor: =gospel_pps=<a class="headerlink" href="#gospel-preprocessor-gospel-pps" title="Permalink to this headline">¶</a></h3>
+<h3>Gospel preprocessor: <code class="docutils literal notranslate"><span class="pre">gospel_pps</span></code><a class="headerlink" href="#gospel-preprocessor-gospel-pps" title="Permalink to this headline">¶</a></h3>
 <p>Writing attributes can be tedious, especially when nested. Gospel is provided
 with a preprocessor that lets you write Gospel specifications in special
 comments, starting with a <code class="docutils literal notranslate"><span class="pre">&#64;</span></code>:</p>
