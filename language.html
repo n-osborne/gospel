@@ -40,9 +40,9 @@
 <div class="section" id="general-conventions">
 <h3>General conventions<a class="headerlink" href="#general-conventions" title="Permalink to this headline">¶</a></h3>
 <p>Gospel annotations are written in interface files (<code class="docutils literal notranslate"><span class="pre">.mli</span></code>).</p>
-<p><span class="xref std std-ref">OCaml attributes</span> with the
-identifier <cite>gospel</cite> are used to bear the Gospel specifications in their payload,
-as strings: <code class="docutils literal notranslate"><span class="pre">[&#64;&#64;gospel</span> <span class="pre">&quot;&lt;spec&gt;&quot;]</span></code> or <code class="docutils literal notranslate"><span class="pre">[&#64;&#64;&#64;gospel</span> <span class="pre">&quot;&lt;spec&gt;&quot;]</span></code>.</p>
+<p><cite>OCaml attributes &lt;https://caml.inria.fr/pub/docs/manual-ocaml/attributes.html&gt;</cite>
+with the identifier <cite>gospel</cite> are used to bear the Gospel specifications in their
+payload, as strings: <code class="docutils literal notranslate"><span class="pre">[&#64;&#64;gospel</span> <span class="pre">&quot;&lt;spec&gt;&quot;]</span></code> or <code class="docutils literal notranslate"><span class="pre">[&#64;&#64;&#64;gospel</span> <span class="pre">&quot;&lt;spec&gt;&quot;]</span></code>.</p>
 <p class="rubric">Floating attributes</p>
 <p><a class="reference internal" href="#ghost-and-logical-declarations"><span class="std std-ref">Ghost and logical declarations</span></a> must lie
 in floating attributes, inside module signatures:</p>
@@ -146,8 +146,8 @@ have three clauses: one <a class="reference internal" href="#preconditions"><spa
                  | <a class="reference internal" href="#grammar-token-postcondition"><code class="xref docutils literal notranslate"><span class="pre">postcondition</span></code></a>
                  | <a class="reference internal" href="#grammar-token-exceptional-postcondition"><code class="xref docutils literal notranslate"><span class="pre">exceptional_postcondition</span></code></a>
                  | &quot;modifies&quot; <a class="reference internal" href="#grammar-token-term"><code class="xref docutils literal notranslate"><span class="pre">term</span></code></a> (&quot;,&quot; <a class="reference internal" href="#grammar-token-term"><code class="xref docutils literal notranslate"><span class="pre">term</span></code></a>)*
-                 | &quot;equivalent&quot; <code class="xref docutils literal notranslate"><span class="pre">string</span></code>
-                 | &quot;diverges&quot;
+                 | <a class="reference internal" href="#grammar-token-equivalence"><code class="xref docutils literal notranslate"><span class="pre">equivalence</span></code></a>
+                 | <a class="reference internal" href="#grammar-token-divergence"><code class="xref docutils literal notranslate"><span class="pre">divergence</span></code></a>
                  | &quot;consumes&quot;
 <strong id="grammar-token-ident-tuple">ident_tuple</strong> ::=  <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code> (&quot;,&quot; <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code>)*
 <strong id="grammar-token-parameter">parameter  </strong> ::=  &quot;()&quot; | <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code> | &quot;~&quot; <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code> | &quot;?&quot; <code class="xref docutils literal notranslate"><span class="pre">identifier</span></code>
@@ -326,7 +326,7 @@ verified in conjunction. For instance, the contract:</p>
 <p>Some exceptions are not expected to be listed, because they could be
 unexpectedly triggered depending on the specifics of the machine the
 code is executed on.  There are two such exceptions in Gospel:
-<cite>Stack_overflow</cite> and <cite>Out_of_memory</cite>.</p>
+<code class="docutils literal notranslate"><span class="pre">Stack_overflow</span></code> and <code class="docutils literal notranslate"><span class="pre">Out_of_memory</span></code>.</p>
 <p>These exceptions are always assumed to be possibly raised by any
 function, without an explicit <code class="docutils literal notranslate"><span class="pre">raises</span></code>. This is equivalent to adding a
 <code class="docutils literal notranslate"><span class="pre">raises</span> <span class="pre">Out_of_memory</span> <span class="pre">|</span> <span class="pre">Stack_overflow</span> <span class="pre">-&gt;</span> <span class="pre">true</span></code> clause to every function
@@ -342,25 +342,57 @@ space as follows:</p>
 </div>
 <div class="section" id="code-equivalence">
 <span id="index-6"></span><h3>Code equivalence<a class="headerlink" href="#code-equivalence" title="Permalink to this headline">¶</a></h3>
+<p>Complementary to other specification clauses, Gospel allows the writer of the
+interface to talk about <em>code equivalence</em> in the function contract. Such a code
+equivalence is specified in a clause introduced by the keyword <code class="docutils literal notranslate"><span class="pre">equivalent</span></code>,
+followed by a string containing the OCaml code the function should behave like.</p>
+<pre>
+<strong id="grammar-token-equivalence">equivalence</strong> ::=  &quot;equivalent&quot; <code class="xref docutils literal notranslate"><span class="pre">string</span></code>
+</pre>
+<p>This is particularly useful when specifying functions which behaviour can hardly
+be expressed in pure logic:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="n">iter</span><span class="o">:</span> <span class="o">(</span><span class="k">&#39;</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="kt">unit</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="k">&#39;</span><span class="n">a</span> <span class="n">t</span> <span class="o">-&gt;</span> <span class="kt">unit</span>
+<span class="c">(*@ iter f t</span>
+<span class="c">    equivalent &quot;List.iter f (to_list t)&quot; *)</span>
+</pre></div>
+</div>
+<p>With such a specification, no logical assertion is provided, but applying
+<code class="docutils literal notranslate"><span class="pre">iter</span></code> to <code class="docutils literal notranslate"><span class="pre">f</span></code> and <code class="docutils literal notranslate"><span class="pre">t</span></code> is equivalent to applying <code class="docutils literal notranslate"><span class="pre">List.iter</span></code> to <code class="docutils literal notranslate"><span class="pre">f</span></code>,
+and the conversion of <code class="docutils literal notranslate"><span class="pre">t</span></code> to a list. This does not leak implementation
+details, as <code class="docutils literal notranslate"><span class="pre">iter</span></code> might in fact be implemented in a different, more
+efficient, way, it does however make the specification concise and elegant.</p>
 <div class="admonition-todo admonition" id="id7">
 <p class="admonition-title">Todo</p>
-<p>do it</p>
+<p>Warn about the OCaml code not being parsed/type-checked at the moment
+(or do it).</p>
 </div>
 </div>
 <div class="section" id="non-termination">
 <span id="index-7"></span><h3>Non termination<a class="headerlink" href="#non-termination" title="Permalink to this headline">¶</a></h3>
-<div class="admonition-todo admonition" id="id8">
-<p class="admonition-title">Todo</p>
-<p>do it</p>
+<p>OCaml functions with attached contracts are always considered to be terminating
+by default.</p>
+<p>If one function is allowed to not terminate (e.g. a game or server main loop, a
+function waiting for a signal or event, etc.), one can add this information to
+the contract using the <code class="docutils literal notranslate"><span class="pre">diverges</span></code> keyword.</p>
+<pre>
+<strong id="grammar-token-divergence">divergence</strong> ::=  &quot;diverges&quot;
+</pre>
+<p>The following example states that the execution of the function <code class="docutils literal notranslate"><span class="pre">run</span></code> may not
+terminate. It is not specified whether this function is always non-terminating
+or not:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="n">run</span> <span class="o">:</span> <span class="kt">unit</span> <span class="o">-&gt;</span> <span class="kt">unit</span>
+<span class="c">(*@ run ()</span>
+<span class="c">    diverges *)</span>
+</pre></div>
 </div>
 <span class="target" id="index-8"></span></div>
 <div class="section" id="effects">
 <span id="index-9"></span><h3>Effects<a class="headerlink" href="#effects" title="Permalink to this headline">¶</a></h3>
-<div class="admonition-todo admonition" id="id9">
+<div class="admonition-todo admonition" id="id8">
 <p class="admonition-title">Todo</p>
 <p>do it</p>
 </div>
-<div class="admonition-todo admonition" id="id10">
+<div class="admonition-todo admonition" id="id9">
 <p class="admonition-title">Todo</p>
 <p>when we have ensures+raises+modifies, the effect stated by
 modifies applies for both ensures and raises</p>
@@ -371,14 +403,14 @@ modifies applies for both ensures and raises</p>
 </div>
 <div class="section" id="type-specification">
 <span id="index-13"></span><h2>Type Specification<a class="headerlink" href="#type-specification" title="Permalink to this headline">¶</a></h2>
-<div class="admonition-todo admonition" id="id11">
+<div class="admonition-todo admonition" id="id10">
 <p class="admonition-title">Todo</p>
 <p>do it</p>
 </div>
 <span class="target" id="index-14"></span><span class="target" id="index-15"></span><span class="target" id="index-16"></span></div>
 <div class="section" id="ghost-and-logical-declarations">
 <span id="index-17"></span><h2>Ghost and Logical Declarations<a class="headerlink" href="#ghost-and-logical-declarations" title="Permalink to this headline">¶</a></h2>
-<div class="admonition-todo admonition" id="id12">
+<div class="admonition-todo admonition" id="id11">
 <p class="admonition-title">Todo</p>
 <p>do it</p>
 </div>
