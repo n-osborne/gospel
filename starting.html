@@ -15,7 +15,7 @@
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Example Tools" href="tools.html" />
+    <link rel="next" title="Language Specification" href="language.html" />
     <link rel="prev" title="Welcome to Gospel’s documentation!" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -37,9 +37,33 @@
 <h1>Starting Example<a class="headerlink" href="#starting-example" title="Permalink to this headline">¶</a></h1>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">type</span> <span class="k">&#39;</span><span class="n">a</span> <span class="n">t</span>
 <span class="c">(*@ mutable model view: &#39;a seq *)</span>
+
+<span class="k">val</span> <span class="n">create</span> <span class="o">:</span> <span class="kt">unit</span> <span class="o">-&gt;</span> <span class="k">&#39;</span><span class="n">a</span> <span class="n">t</span>
+<span class="c">(** Return a new queue, initially empty. *)</span>
+<span class="c">(*@ q = create ()</span>
+<span class="c">      ensures q.view = empty *)</span>
+
+<span class="k">val</span> <span class="n">push</span> <span class="o">:</span> <span class="k">&#39;</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="k">&#39;</span><span class="n">a</span> <span class="n">t</span> <span class="o">-&gt;</span> <span class="kt">unit</span>
+<span class="c">(** [add x q] adds the element [x] at the end of the queue [q]. *)</span>
+<span class="c">(*@ push x q</span>
+<span class="c">      modifies q</span>
+<span class="c">      ensures  q.view = snoc (old q.view) x *)</span>
+
+<span class="k">val</span> <span class="n">pop</span> <span class="o">:</span> <span class="k">&#39;</span><span class="n">a</span> <span class="n">t</span> <span class="o">-&gt;</span> <span class="k">&#39;</span><span class="n">a</span>
+<span class="c">(** [pop q] removes and returns the first element in queue [q]. *)</span>
+<span class="c">(*@ r = pop q</span>
+<span class="c">      checks   q.view &lt;&gt; empty</span>
+<span class="c">      modifies q</span>
+<span class="c">      ensures  old q.view = cons r q.view *)</span>
+
+<span class="o">+</span> <span class="n">variant</span> <span class="k">with</span> <span class="n">raises</span>
+
+<span class="k">val</span> <span class="n">is_empty</span> <span class="o">:</span> <span class="k">&#39;</span><span class="n">a</span> <span class="n">t</span> <span class="o">-&gt;</span> <span class="kt">bool</span>
+<span class="c">(** Return [true] if the given queue is empty, [false] otherwise. *)</span>
+<span class="c">(*@ b = is_empty q</span>
+<span class="c">      ensures b &lt;-&gt; q.view = empty *)</span>
 </pre></div>
 </div>
-<p>Foo bar.</p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="k">val</span> <span class="n">push</span><span class="o">:</span> <span class="k">&#39;</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="k">&#39;</span><span class="n">a</span> <span class="n">t</span> <span class="o">-&gt;</span> <span class="kt">unit</span>
 <span class="c">(*@ push v q</span>
 <span class="c">    modifies q</span>
@@ -144,9 +168,9 @@ follows:</p>
 <li class="toctree-l2"><a class="reference internal" href="#ocaml-rtac">OCaml RTAC</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tools.html">Example Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="language.html">Language Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Gospel API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Example Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
 <li class="toctree-l1"><a class="reference internal" href="todos.html">Documentation TODOs</a></li>
 </ul>
@@ -156,7 +180,7 @@ follows:</p>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">Welcome to Gospel’s documentation!</a></li>
-      <li>Next: <a href="tools.html" title="next chapter">Example Tools</a></li>
+      <li>Next: <a href="language.html" title="next chapter">Language Specification</a></li>
   </ul></li>
 </ul>
 </div>
