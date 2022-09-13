@@ -2,7 +2,10 @@ Require Import List.
 Open Scope list_scope.
 Open Scope type_scope.
 
-Variable combine3   : forall {A B C : Set} ,list A -> list B -> list C -> list (A * B * C).
+Variable combine3   : forall {A B C : Set}, list A -> list B -> list C -> list (A * B * C).
+Variable fst3       : forall {A B C : Set}, (A * B * C) -> A.
+Variable snd3       : forall {A B C : Set}, (A * B * C) -> B.
+Variable thd3       : forall {A B C : Set}, (A * B * C) -> C.
 Variable pat        : Set.
 Variable identifier : Set.
 Variable constant   : Set.
@@ -96,7 +99,8 @@ Inductive BindersTy : env -> list binder -> list gospel_ty -> Prop :=
 Variable BindersId : list binder -> list identifier -> Prop.
 
 (* TODO for let polymorphism! *)
-Variable gen : gospel_ty -> gospel_ty.
+(* quantifies over all the type variable in the argument that is not in the environment *)
+Variable gen : env -> gospel_ty -> gospel_ty.
 Variable check_pattern : gospel_ty -> pat -> Prop.
 
 Inductive typing : env -> term -> gospel_ty -> Prop :=
@@ -114,7 +118,8 @@ Inductive typing : env -> term -> gospel_ty -> Prop :=
     (* ------------------------------------------- *)
     typing gamma (Tconst const) (get_const_ty const)
 
-(* lookup in the gammaironment in order to infer the type af a variable *)
+(* lookup in the environment in order to infer the type af a variable *)
+(* should specialize the type ? *)
 | R_Tpreid :
     Lookup gamma id ty
     (* -------------------------------------- *)
@@ -166,7 +171,7 @@ Inductive typing : env -> term -> gospel_ty -> Prop :=
 
 | R_Tlet :
   typing gamma t0 tau
-  -> typing ((id, gen tau) :: gamma) t1 sigma
+  -> typing ((id, gen gamma tau) :: gamma) t1 sigma
 (* ----------------------------------------------------- *)
   -> typing gamma (Tlet id t0 t1) sigma
 
@@ -210,16 +215,15 @@ Inductive typing : env -> term -> gospel_ty -> Prop :=
     (* really really hugly *)
     -> Forall
          (fun x =>
-            match x with
-            | (id, t, ty) =>
-              (* the type is associated with the field in the record type *)
-              In (id, ty) (combine fieldsid1 fieldsty1)
-              (* the term has the right type *)
-              /\ typing gamma t ty (* non strictly positive occurence of typing... *)
-            end)
-         (combine3 fieldsid0 fieldsval0 fieldsty0)
+            (* a pattern matching would be easier to read but raises non strictly positive occurence of typing *)
+              In (fst3 x, thd3 x) (combine fieldsid1 fieldsty1)
+              /\ typing gamma (snd3 x) (thd3 x))
+        (combine3 fieldsid0 fieldsval0 fieldsty0)
     (* ------------------------------------------------------------------- *)
-    -> typing gamma (Tupdate (Trecord (combine fieldsid1 fieldsval1)) (combine fieldsid0 fieldsval0)) (NTuple (combine fieldsid1 fieldsty1))
+    -> typing
+         gamma
+         (Tupdate (Trecord (combine fieldsid1 fieldsval1)) (combine fieldsid0 fieldsval0))
+         (NTuple (combine fieldsid1 fieldsty1))
 
 (* don't really know what it is...
   | Tscope  : identifier -> term -> term
@@ -227,6 +231,7 @@ Inductive typing : env -> term -> gospel_ty -> Prop :=
 
 | R_Told :
   typing gamma t ty
+  (* ------------------------ *)
   -> typing gamma (Told t) ty
 
 with bar : env -> list term -> list gospel_ty -> Prop :=
