@@ -76,14 +76,19 @@ let t_ty_check t ty =
   | None, None -> ()
 
 let ls_arg_inst ls tl =
-  try
-    List.fold_left2
-      (fun tvm ty t -> ty_match tvm ty (t_type t))
-      Mtv.empty ls.ls_args tl
-  with Invalid_argument _ ->
-    let loc = (List.hd tl).t_loc in
-    W.error ~loc
-      (W.Bad_arity (ls.ls_name.id_str, List.length ls.ls_args, List.length tl))
+  let rec aux s tys ts =
+    match (tys, ts) with
+    | _, [] -> s
+    | ty :: tys, t :: ts ->
+        let s = ty_match s ty (t_type t) in
+        aux s tys ts
+    | [], t :: _ ->
+        let loc = t.t_loc in
+        W.error ~loc
+          (W.Bad_arity
+             (ls.ls_name.id_str, List.length ls.ls_args, List.length tl))
+  in
+  aux Mtv.empty ls.ls_args tl
 
 let ls_app_inst ls tl ty =
   let s = ls_arg_inst ls tl in
