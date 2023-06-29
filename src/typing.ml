@@ -261,8 +261,8 @@ let rec dterm kid crcm ns denv { term_desc; term_loc = loc } : dterm =
     | [ { term_desc = Ttuple tl; _ } ] when List.length tl = n && ls.ls_constr
       ->
         gen_app ~loc ls tl
-    | _ when List.length tl < n ->
-        W.error ~loc (W.Partial_application ls.ls_name.id_str)
+    (* | _ when List.length tl < n -> *)
+    (*     W.error ~loc (W.Partial_application ls.ls_name.id_str) *)
     | _ ->
         let args, extra = split_at_i (List.length ls.ls_args) tl in
         let dtl = List.map (dterm kid crcm ns denv) args in
@@ -317,8 +317,8 @@ let rec dterm kid crcm ns denv { term_desc; term_loc = loc } : dterm =
       let ls = find_q_ls ns q in
       if ls.ls_field then
         W.error ~loc (W.Symbol_not_found (string_list_of_qualid q));
-      if ls.ls_args <> [] then
-        W.error ~loc (W.Partial_application ls.ls_name.id_str);
+      (* if ls.ls_args <> [] then *)
+      (*   W.error ~loc (W.Partial_application ls.ls_name.id_str); *)
       let _, dty = specialize_ls ls in
       let node, dty = (DTapp (ls, []), dty) in
       mk_dterm ~loc node dty
