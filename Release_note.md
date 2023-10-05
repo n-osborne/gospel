@@ -6,19 +6,20 @@ odoc.
 
 Some minor extensions have been added to the language itself:
 - a `with` construct to name a variable in type invariants referring to a
-  value of the specified type.
-- `int` literals.
-- patterns in arguments and return type annotation in anonymous functions
-- unit result in function header
-- constants can now be referenced in specifications.
-- infix operators in specificaion headers are now accepted.
+  value of the specified type,
+- `int` literals,
+- patterns in arguments and return type annotation in anonymous functions,
+- unit result in function header,
+- constants can now be referenced in specifications,
+- infix operators are now accepted in specification headers.
 
-Parser, preprocessor and error messages have been improved.
+Parser, preprocessor and error messages have been improved. In particular the
+preprocessor can now handle large files and locations are properly tracked.
 
-Pattern matching are now checked for exhaustiveness and redundancy.
+Pattern matches are now checked for exhaustiveness and redundancy.
 
-A number of improvement and bugfixes in the type checker.
+A number of improvements and bugfixes in the type checker.
 
 Some minor modifications in the Gospel standard library.
 
-Documentation has been updated.
+Documentation has been revised.
