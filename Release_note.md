@@ -1,6 +1,6 @@
 # 0.2
 
-This release add two main features, a `gospel dumpast` command and a
+This release adds two main features, a `gospel dumpast` command and a
 `gospel.ppx` ppx rewriter to display gospel contents as documentation with
 odoc.
 
@@ -8,7 +8,7 @@ Some minor extensions have been added to the language itself:
 - a `with` construct to name a variable in type invariants referring to a
   value of the specified type,
 - `int` literals,
-- patterns in arguments and return type annotation in anonymous functions,
+- anonymous functions now support both patterns in arguments and return type annotations
 - unit result in function header,
 - constants can now be referenced in specifications,
 - infix operators are now accepted in specification headers.
