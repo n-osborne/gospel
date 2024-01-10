@@ -17,8 +17,9 @@
 
 {
 open Lexing
-open Misc
-open Parser
+open Ocaml_common.Misc
+open Ocaml_common.Parser
+open Ocaml_common
 
 type error =
   | Illegal_character of char
@@ -151,7 +152,7 @@ let store_escaped_char lexbuf c =
 let store_escaped_uchar lexbuf u =
   if in_comment () then store_lexeme lexbuf else store_string_utf_8_uchar u
 
-let compute_quoted_string_idloc {Location.loc_start = orig_loc } shift id =
+let compute_quoted_string_idloc {Location.loc_start = orig_loc;_ } shift id =
   let id_start_pos = orig_loc.Lexing.pos_cnum + shift in
   let loc_start =
     Lexing.{orig_loc with pos_cnum = id_start_pos }
@@ -301,56 +302,56 @@ let comments () = List.rev !comment_list
 
 (* Error report *)
 
-open Format
+(* open Format *)
 
-let prepare_error loc = function
-  | Illegal_character c ->
-      Location.errorf ~loc "Illegal character (%s)" (Char.escaped c)
-  | Illegal_escape (s, explanation) ->
-      Location.errorf ~loc
-        "Illegal backslash escape in string or character (%s)%t" s
-        (fun ppf -> match explanation with
-           | None -> ()
-           | Some expl -> fprintf ppf ": %s" expl)
-  | Reserved_sequence (s, explanation) ->
-      Location.errorf ~loc
-        "Reserved character sequence: %s%t" s
-        (fun ppf -> match explanation with
-           | None -> ()
-           | Some expl -> fprintf ppf " %s" expl)
-  | Unterminated_comment _ ->
-      Location.errorf ~loc "Comment not terminated"
-  | Unterminated_string ->
-      Location.errorf ~loc "String literal not terminated"
-  | Unterminated_string_in_comment (_, literal_loc) ->
-      Location.errorf ~loc
-        "This comment contains an unterminated string literal"
-        ~sub:[Location.msg ~loc:literal_loc "String literal begins here"]
-  | Empty_character_literal ->
-      let msg = "Illegal empty character literal ''" in
-      let sub =
-        [Location.msg
-           "@{<hint>Hint@}: Did you mean ' ' or a type variable 'a?"] in
-      Location.error ~loc ~sub msg
-  | Keyword_as_label kwd ->
-      Location.errorf ~loc
-        "%a is a keyword, it cannot be used as label name" Style.inline_code kwd
-  | Invalid_literal s ->
-      Location.errorf ~loc "Invalid literal %s" s
-  | Invalid_directive (dir, explanation) ->
-      Location.errorf ~loc "Invalid lexer directive %S%t" dir
-        (fun ppf -> match explanation with
-           | None -> ()
-           | Some expl -> fprintf ppf ": %s" expl)
+(* let prepare_error loc = function *)
+(*   | Illegal_character c -> *)
+(*       Location.errorf ~loc "Illegal character (%s)" (Char.escaped c) *)
+(*   | Illegal_escape (s, explanation) -> *)
+(*       Location.errorf ~loc *)
+(*         "Illegal backslash escape in string or character (%s)%t" s *)
+(*         (fun ppf -> match explanation with *)
+(*            | None -> () *)
+(*            | Some expl -> fprintf ppf ": %s" expl) *)
+(*   | Reserved_sequence (s, explanation) -> *)
+(*       Location.errorf ~loc *)
+(*         "Reserved character sequence: %s%t" s *)
+(*         (fun ppf -> match explanation with *)
+(*            | None -> () *)
+(*            | Some expl -> fprintf ppf " %s" expl) *)
+(*   | Unterminated_comment _ -> *)
+(*       Location.errorf ~loc "Comment not terminated" *)
+(*   | Unterminated_string -> *)
+(*       Location.errorf ~loc "String literal not terminated" *)
+(*   | Unterminated_string_in_comment (_, literal_loc) -> *)
+(*       Location.errorf ~loc *)
+(*         "This comment contains an unterminated string literal" *)
+(*         ~sub:[Location.msg ~loc:literal_loc "String literal begins here"] *)
+(*   | Empty_character_literal -> *)
+(*       let msg = "Illegal empty character literal ''" in *)
+(*       let sub = *)
+(*         [Location.msg *)
+(*            "@{<hint>Hint@}: Did you mean ' ' or a type variable 'a?"] in *)
+(*       Location.error ~loc ~sub msg *)
+(*   | Keyword_as_label kwd -> *)
+(*       Location.errorf ~loc *)
+(*         "%a is a keyword, it cannot be used as label name" Style.inline_code kwd *)
+(*   | Invalid_literal s -> *)
+(*       Location.errorf ~loc "Invalid literal %s" s *)
+(*   | Invalid_directive (dir, explanation) -> *)
+(*       Location.errorf ~loc "Invalid lexer directive %S%t" dir *)
+(*         (fun ppf -> match explanation with *)
+(*            | None -> () *)
+(*            | Some expl -> fprintf ppf ": %s" expl) *)
 
-let () =
-  Location.register_error_of_exn
-    (function
-      | Error (err, loc) ->
-          Some (prepare_error loc err)
-      | _ ->
-          None
-    )
+(* let () = *)
+(*   Location.register_error_of_exn *)
+(*     (function *)
+(*       | Error (err, loc) -> *)
+(*           Some (prepare_error loc err) *)
+(*       | _ -> *)
+(*           None *)
+(*     ) *)
 
 }
 
@@ -507,6 +508,13 @@ rule token = parse
       { let s, loc = wrap_comment_lexer comment lexbuf in
         if !handle_docstrings then
           DOCSTRING (Docstrings.docstring s loc)
+        else
+          COMMENT ("*" ^ s, loc)
+      }
+  | "(*@"
+      { let s, loc = wrap_comment_lexer comment lexbuf in
+        if !handle_docstrings then
+          DOCSTRING (Docstrings.docstring ("@gospel" ^ s) loc)
         else
           COMMENT ("*" ^ s, loc)
       }
