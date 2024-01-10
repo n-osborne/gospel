@@ -32,12 +32,58 @@ let with_loadpath load_path file =
   else if Sys.file_exists file then file
   else raise Not_found
 
+let process_attribute attr =
+  match attr.attr_payload with
+  | PStr
+      [
+        ({
+           pstr_desc =
+             Pstr_eval
+               ( ({
+                    pexp_desc = Pexp_constant (Pconst_string (spec, loc, opt));
+                    _;
+                  } as exp),
+                 attrs );
+           _;
+         } as pstr);
+      ]
+    when String.starts_with ~prefix:"@gospel" spec ->
+      let spec = String.sub spec 7 (String.length spec - 7) in
+      let pexp_desc = Pexp_constant (Pconst_string (spec, loc, opt)) in
+      let pstr_desc = Pstr_eval ({ exp with pexp_desc }, attrs) in
+      let attr_payload = PStr [ { pstr with pstr_desc } ] in
+      let attr_name = { attr.attr_name with txt = "gospel" } in
+      { attr with attr_payload; attr_name }
+  | _ -> attr
+
+let rec signature = function
+  | [] -> []
+  | ({ psig_desc = Psig_attribute attr; _ } as x) :: xs ->
+      let attr = process_attribute attr in
+      let psig_desc = Psig_attribute attr in
+      { x with psig_desc } :: signature xs
+  | x :: xs -> x :: signature xs
+
+let rec attributes = function
+  | [] -> []
+  | x :: xs -> process_attribute x :: attributes xs
+
+let merge =
+  object
+    inherit Ast_traverse.map as super
+    method! signature s = super#signature s |> signature
+    method! attributes attrs = super#attributes attrs |> attributes
+  end
+
 let parse_ocaml_lb lb =
-  try Oparse.interface lb
-  with _ ->
-    let loc_start, loc_end = (lb.lex_start_p, lb.lex_curr_p) in
-    let loc = Location.{ loc_start; loc_end; loc_ghost = false } in
-    W.error ~loc W.Syntax_error
+  let parsetree =
+    try Oparse.interface lb
+    with _ ->
+      let loc_start, loc_end = (lb.lex_start_p, lb.lex_curr_p) in
+      let loc = Location.{ loc_start; loc_end; loc_ghost = false } in
+      W.error ~loc W.Syntax_error
+  in
+  merge#signature parsetree
 
 let parse_ocaml file =
   let lb =
