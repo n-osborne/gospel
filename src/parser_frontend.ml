@@ -33,11 +33,9 @@ let with_loadpath load_path file =
   else raise Not_found
 
 let parse_ocaml_lb lb =
-  let lb_pps = Fmt.str "%a" Pps.run lb |> Lexing.from_string in
-  Location.init lb_pps lb.lex_start_p.pos_fname;
-  try Parse.interface lb_pps
+  try Oparse.interface lb
   with _ ->
-    let loc_start, loc_end = (lb_pps.lex_start_p, lb_pps.lex_curr_p) in
+    let loc_start, loc_end = (lb.lex_start_p, lb.lex_curr_p) in
     let loc = Location.{ loc_start; loc_end; loc_ghost = false } in
     W.error ~loc W.Syntax_error
 
