@@ -99,5 +99,23 @@ let merge =
     method! attributes attrs = super#attributes attrs |> attributes
   end
 
-let preprocess_intf = merge#signature
+let path2module p =
+  Filename.basename p |> Filename.chop_extension |> String.capitalize_ascii
+
+let check : signature_item list -> unit = function
+  | [] -> ()
+  | x :: _ as xs ->
+      let open Gospel in
+      let path = x.psig_loc.loc_start.pos_fname in
+      let module_nm = path2module path in
+      let uast = Parser_frontend.parse_gospel ~filename:path xs module_nm
+      and md = Tmodule.init_muc path
+      and penv = path2module path |> Utils.Sstr.singleton |> Typing.penv [] in
+      List.fold_left (Typing.type_sig_item penv) md uast |> ignore
+
+let preprocess_intf s =
+  let open Gospel.Warnings in
+  let () = try check s with Error e -> pp Fmt.stderr e in
+  merge#signature s
+
 let () = Driver.register_transformation ~preprocess_intf "odoc_of_gospel"
