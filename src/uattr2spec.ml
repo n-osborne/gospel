@@ -46,22 +46,17 @@ let get_inner_spec attr =
   | PStr [ { pstr_desc = Pstr_eval (_, attrs); _ } ] -> get_spec_attr attrs
   | _ -> assert false
 
-let parse_gospel ~filename parse attr =
+let parse_gospel ~filename inc_par attr =
   let spec, spec_loc = get_spec_content attr in
   let lb = Lexing.from_string spec in
   Lexing.set_position lb spec_loc.loc_start;
   Lexing.set_filename lb filename;
-  try (spec, parse Ulexer.token lb)
-  with Uparser.Error ->
-    let loc =
-      { loc_start = lb.lex_start_p; loc_end = lb.lex_curr_p; loc_ghost = false }
-    in
-    W.error ~loc W.Syntax_error
+  spec, Ulrgrep.parse lb inc_par
 
 let type_declaration ~filename t =
   let spec_attr, other_attrs = get_spec_attr t.ptype_attributes in
   let parse attr =
-    let ty_text, spec = parse_gospel ~filename Uparser.type_spec attr in
+    let ty_text, spec = parse_gospel ~filename Uparser.Incremental.type_spec attr in
     let ty_loc = get_spec_loc attr in
     { spec with ty_text; ty_loc }
   in
@@ -81,7 +76,7 @@ let type_declaration ~filename t =
 let val_description ~filename v =
   let spec_attr, other_attrs = get_spec_attr v.pval_attributes in
   let parse attr =
-    let sp_text, spec = parse_gospel ~filename Uparser.val_spec attr in
+    let sp_text, spec = parse_gospel ~filename Uparser.Incremental.val_spec attr in
     let sp_loc = get_spec_loc attr in
     { spec with sp_text; sp_loc }
   in
@@ -108,7 +103,7 @@ let ghost_spec ~filename attr =
         let tspec =
           get_inner_spec attr
           |> fst
-          |> Option.map (parse_gospel ~filename Uparser.type_spec)
+          |> Option.map (parse_gospel ~filename Uparser.Incremental.type_spec)
           |> Option.map (fun (ty_text, spec) ->
                  let ty_loc = get_spec_loc attr in
                  { spec with ty_text; ty_loc })
@@ -122,7 +117,7 @@ let ghost_spec ~filename attr =
         let vspec =
           get_inner_spec attr
           |> fst
-          |> Option.map (parse_gospel ~filename Uparser.val_spec)
+          |> Option.map (parse_gospel ~filename Uparser.Incremental.val_spec)
           |> Option.map (fun (sp_text, spec) ->
                  let sp_loc = get_spec_loc attr in
                  { spec with sp_text; sp_loc })
@@ -137,13 +132,13 @@ let ghost_spec ~filename attr =
 
 let floating_spec ~filename a =
   try
-    let fun_text, fun_ = parse_gospel ~filename Uparser.func a in
+    let fun_text, fun_ = parse_gospel ~filename Uparser.Incremental.func a in
     let fun_ = { fun_ with fun_text } in
     if fun_.fun_spec = None then
       let fun_spec =
         get_inner_spec a
         |> fst
-        |> Option.map (parse_gospel ~filename Uparser.func_spec)
+        |> Option.map (parse_gospel ~filename Uparser.Incremental.func_spec)
         |> Option.map (fun (fun_text, (spec : fun_spec)) ->
                let fun_loc = get_spec_loc a in
                { spec with fun_text; fun_loc })
@@ -152,7 +147,7 @@ let floating_spec ~filename a =
     else Sig_function fun_
   with W.Error (_, W.Syntax_error) -> (
     try
-      let ax_text, axiom = parse_gospel ~filename Uparser.axiom a in
+      let ax_text, axiom = parse_gospel ~filename Uparser.Incremental.axiom a in
       let ax_loc = get_spec_loc a in
       Sig_axiom { axiom with ax_text; ax_loc }
     with W.Error (_, W.Syntax_error) -> ghost_spec ~filename a)
