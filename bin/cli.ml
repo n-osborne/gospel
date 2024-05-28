@@ -26,6 +26,10 @@ let test test =
 let test_intf = test intf
 let test_file = test file
 
+let dsource =
+  let doc = "Print source code corresponding to the final typed ast." in
+  Arg.(value & flag & info [ "dsource" ] ~doc)
+
 let verbose =
   let doc = "Print all intermediate forms." in
   Arg.(value & flag & info [ "v"; "verbose" ] ~doc)
@@ -42,7 +46,7 @@ let files =
   let doc = "File to be processed, expect a .mli or a .ml file" in
   Arg.(non_empty & pos_all test_file [] & info [] ~doc ~docv:"FILE")
 
-let run_check verbose load_path file =
+let run_check verbose dsource load_path file =
   let load_path =
     List.fold_left
       (fun acc f ->
@@ -50,7 +54,7 @@ let run_check verbose load_path file =
         if not (List.mem dir acc) then dir :: acc else acc)
       load_path file
   in
-  let b = Check.run { verbose; load_path } file in
+  let b = Check.run { verbose; dsource; load_path } file in
   if not b then exit 125 else ()
 
 let run_dumpast load_path file =
@@ -73,7 +77,7 @@ let dumpast =
 let tc =
   let doc = "Gospel type-checker." in
   let info = Cmd.info "check" ~doc in
-  let term = Term.(const run_check $ verbose $ load_path $ intfs) in
+  let term = Term.(const run_check $ verbose $ dsource $ load_path $ intfs) in
   Cmd.v info term
 
 let pps =
