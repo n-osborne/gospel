@@ -21,3 +21,10 @@ val p : t -> t
 val f : t -> t
 (*@ y = f x
     ensures y.m = (p x).m *)
+
+(* Use pattern matching in specifications *)
+val g : t -> t list -> t
+(*@ r = g x xs
+    ensures r = match xs with
+                | [] -> x
+                | y :: _ -> y *)
