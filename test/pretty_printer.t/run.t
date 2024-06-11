@@ -16,10 +16,10 @@ Running `gospel check --dsource` to test pretty printing
   
   (*@ axiom infix: exists x_1 y. x_1 - y = 0 *)
   
-  (*@ axiom infix_partial_application: exists x_2 y_1. let f = (-) x_2 in apply
+  (*@ axiom infix_partial_application: exists x_2 y_1. let f = (-) x_2 in 
   f y_1 = 0 *)
   
   (*@ axiom mixfix: exists xs. xsGospelstdlib.[42] = 42 *)
   
   (*@ axiom mixfix_partial_application: exists xs_1. let f_1 = (Gospelstdlib.[_.._]) 
-  xs_1 42 in Gospelstdlib.Sequence.mem apply f_1 73 42 *)
+  xs_1 42 in Gospelstdlib.Sequence.mem f_1 73 42 *)

@@ -143,6 +143,8 @@ struct
                   failwith
                     "No mixfix symbols are defined with an arity greater than \
                      the number of underscore + 1 ")
+          | Identifier.Normal when ls_equal ls Symbols.fs_apply ->
+              pp fmt "%a" (annotated (list ~sep:sp print_term)) tl
           | Identifier.Normal ->
               let aux fmt (id, args) =
                 pp fmt "%a%a" Ident.pp id
