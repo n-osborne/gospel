@@ -41,6 +41,6 @@ Running `gospel check --dsource` to test pretty printing
   (*@ r = g x_5 xs_2
       ensures r = match xs_2 with
               | [] -> x_5
-              | :: (y_4, _) -> y_4
+              | y_4 :: _ -> y_4
               end::t*)
 

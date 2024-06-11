@@ -53,6 +53,11 @@ struct
           pl
     | Papp (cs, []) -> print_ls_nm fmt cs
     | Papp (cs, [ pl ]) -> pp fmt "%a@ %a" print_ls_nm cs (print_pat_node 2) pl
+    (* There is only one constructor with non normal fixity to pattern match on:
+       the cons one *)
+    | Papp (cs, [ left; right ]) when cs.ls_name.id_fixity = Infix ->
+        pp fmt "%a %a %a" (print_pat_node 2) left print_ls_nm cs
+          (print_pat_node 2) right
     | Papp (cs, pl) ->
         pp fmt "%a@ (%a)" print_ls_nm cs (list ~sep:comma (print_pat_node 2)) pl
     | Pconst c -> Opprintast.constant fmt c
