@@ -182,9 +182,12 @@ struct
                 pp fmt "| @[%a@] when @[%a@] -> @[%a@]" print_pattern p
                   print_term g print_term t
           in
-          pp fmt "match %a with@\n%a@\nend:%a" print_term t
-            (list ~sep:newline print_branch)
-            ptl print_ty t_ty
+          let aux fmt (case, branches) =
+            pp fmt "match %a with@\n%a" print_term case
+              (list ~sep:newline print_branch)
+              branches
+          in
+          pp fmt "%a" (annotated aux) (t, ptl)
       | Told t -> pp fmt "old (%a)" print_term t
     in
     let print_attrs fmt = List.iter (pp fmt "[%@ %s]") in
