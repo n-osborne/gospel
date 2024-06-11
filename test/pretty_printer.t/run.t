@@ -30,7 +30,8 @@ Running `gospel check --dsource` to test pretty printing
            mutable model m : integer *)
   
   val p : t -> t
-  (*@ y_2 = p x_3*)
+  (*@ y_2 = p x_3
+      pure*)
   
   val f_2 : t -> t
   (*@ y_3 = f_2 x_4
