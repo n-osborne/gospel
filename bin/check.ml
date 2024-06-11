@@ -55,8 +55,11 @@ let run_file config file =
       pp fmt "@[********* Typed GOSPEL ********@]@.";
       pp fmt "@[*******************************@]@.";
       pp fmt "@[%a@]@." print_file file);
-    if config.dsource then
-      pp fmt "@[%a@]@." Tast_printer.print_signature file.fl_sigs;
+    (if config.dsource then
+       let open Tast_printer.Make (struct
+         let annot = false
+       end) in
+       pp fmt "@[%a@]@." print_signature file.fl_sigs);
     write_gospel_file md;
     true
   with W.Error e ->

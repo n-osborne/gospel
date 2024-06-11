@@ -568,7 +568,10 @@ let wrap_up_muc (muc : module_uc) =
 (** Pretty printing *)
 
 open Utils.Fmt
-open Tast_printer
+
+open Tast_printer.Make (struct
+  let annot = true
+end)
 
 let rec tree_ns f fmt ns =
   Mstr.iter
