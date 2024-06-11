@@ -7,6 +7,7 @@ Running `gospel check --dsource` to test pretty printing
           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   Error: Syntax error.
   [125]
+
   $ gospel check --dsource lib.mli
   (*@ open Stdlib *)
   
@@ -52,9 +53,7 @@ Running `gospel check --dsource` to test pretty printing
               | [] -> x_6*)
   
   (*@ type g = A of integer
-               function A (_:integer) : g
                | B of bool * integer
-                 function B (_:bool * integer) : g
             *)
 
 

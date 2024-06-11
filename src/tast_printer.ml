@@ -38,8 +38,11 @@ struct
           | ld -> print_label_decl_list print_variant_field fmt ld
         in
         let print_constructor fmt { cd_cs; cd_ld; _ } =
-          pp fmt "@[%a of %a@\n@[<h 2>%a@]@]" Ident.pp_simpl cd_cs.ls_name
-            (print_args cd_cs) cd_ld print_ls_decl cd_cs
+          let pp_ls_decl fmt ls =
+            if S.annot then pp fmt "@\n@[<h 2>%a@]" print_ls_decl ls else ()
+          in
+          pp fmt "@[%a of %a%a@]" Ident.pp_simpl cd_cs.ls_name
+            (print_args cd_cs) cd_ld pp_ls_decl cd_cs
         in
         pp fmt "@[ = %a@]"
           (list ~sep:(newline ++ const string "| ") print_constructor)
