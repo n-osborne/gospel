@@ -22,4 +22,16 @@ Running `gospel check --dsource` to test pretty printing
   (*@ axiom mixfix: exists xs. xsGospelstdlib.[42] = 42 *)
   
   (*@ axiom mixfix_partial_application: exists xs_1. let f_1 = (Gospelstdlib.[_.._]) 
-  xs_1 42 in Gospelstdlib.Sequence.mem f_1 73 42 *)
+  xs_1 42 in Gospelstdlib.Sequence.mem
+  f_1 73 42 *)
+  
+  type t
+       (*@ ephemeral
+           mutable model m : integer *)
+  
+  val p : t -> t
+  (*@ y_2 = p x_3*)
+  
+  val f_2 : t -> t
+  (*@ y_3 = f_2 x_4
+      ensures (y_3).m = (p x_4).m*)
