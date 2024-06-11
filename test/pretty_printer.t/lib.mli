@@ -37,3 +37,7 @@ val f8 : t -> t list -> t
                              | 42 -> x
                              | _ -> y)
                 | [] -> x *)
+
+(* Ghost type declaration *)
+(*@ type g = A of integer | B of (bool * integer) *)
+

@@ -50,5 +50,11 @@ Running `gospel check --dsource` to test pretty printing
                              | 42 -> x_6
                              | _ -> y_5)
               | [] -> x_6*)
+  
+  (*@ type g = A of integer
+               function A (_:integer) : g
+               | B of bool * integer
+                 function B (_:bool * integer) : g
+            *)
 
 
