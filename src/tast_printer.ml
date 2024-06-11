@@ -22,13 +22,13 @@ struct
       Ident.pp_simpl (fst ld.ld_field) print_ty (snd ld.ld_field)
 
   let print_rec_field fmt ld =
-    pp fmt "%s%a:%a"
+    pp fmt "%s%a : %a"
       (if ld.ld_mut = Mutable then "mutable " else "")
       Ident.pp_simpl ld.ld_field.ls_name print_ty
       (Stdlib.Option.get ld.ld_field.ls_value)
 
   let print_label_decl_list print_field fmt fields =
-    pp fmt "{%a}" (list ~sep:semi print_field) fields
+    pp fmt "{ %a }" (list ~sep:semi print_field) fields
 
   let print_type_kind fmt = function
     | Pty_abstract -> ()
@@ -48,12 +48,14 @@ struct
           (list ~sep:(newline ++ const string "| ") print_constructor)
           cpl
     | Pty_record rd ->
-        let pjs = List.map (fun ld -> ld.ld_field) rd.rd_ldl in
-        pp fmt "@[ = %a@\n@[<h 2>%a@]@]"
+        let pjs = List.map (fun ld -> ld.ld_field) rd.rd_ldl
+        and cs_and_pjs fmt xs =
+          if S.annot then
+            pp fmt "@\n@[<h 2>%a@]" (list ~sep:newline print_ls_decl) xs
+        in
+        pp fmt "@[ = %a%a@]"
           (print_label_decl_list print_rec_field)
-          rd.rd_ldl
-          (list ~sep:newline print_ls_decl)
-          (rd.rd_cs :: pjs)
+          rd.rd_ldl cs_and_pjs (rd.rd_cs :: pjs)
 
   let print_type_spec fmt { ty_ephemeral; ty_fields; ty_invariants; _ } =
     if (not ty_ephemeral) && ty_fields = [] && Option.is_none ty_invariants then
