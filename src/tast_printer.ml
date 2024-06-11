@@ -2,7 +2,11 @@ open Utils
 open Ppxlib
 open Tast
 open Symbols
-open Tterm_printer
+
+open Tterm_printer.Make (struct
+  let annot = true
+end)
+
 open Ttypes
 open Upretty_printer
 open Opprintast

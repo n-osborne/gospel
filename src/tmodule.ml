@@ -13,7 +13,11 @@ open Ppxlib
 open Identifier
 open Ttypes
 open Symbols
-open Tterm_printer
+
+open Tterm_printer.Make (struct
+  let annot = true
+end)
+
 open Tast
 open Tast_helper
 
