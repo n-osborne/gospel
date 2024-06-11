@@ -19,7 +19,8 @@ module Make (S : sig
 end) =
 struct
   let print_vs fmt { vs_name; vs_ty } =
-    pp fmt "@[%a:%a@]" Ident.pp_simpl vs_name print_ty vs_ty
+    if S.annot then pp fmt "@[(%a:%a)@]" Ident.pp_simpl vs_name print_ty vs_ty
+    else pp fmt "@[%a@]" Ident.pp_simpl vs_name
 
   let print_ls_decl fmt { ls_name; ls_args; ls_value; _ } =
     let is_func = Option.is_some ls_value in
