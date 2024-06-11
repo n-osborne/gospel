@@ -79,11 +79,14 @@ struct
       | None -> pp fmt ":prop"
       | Some ty -> pp fmt ":%a" print_ty ty
     in
+    let annotated p fmt x =
+      if S.annot then pp fmt "(%a%a)" p x print_ty t_ty else pp fmt "%a" p x
+    in
     let print_t_node fmt t_node =
       match t_node with
-      | Tconst c -> pp fmt "%a%a" Opprintast.constant c print_ty t_ty
-      | Ttrue -> pp fmt "true%a" print_ty t_ty
-      | Tfalse -> pp fmt "false%a" print_ty t_ty
+      | Tconst c -> pp fmt "%a" (annotated Opprintast.constant) c
+      | Ttrue -> pp fmt "%a" (annotated string) "true"
+      | Tfalse -> pp fmt "%a" (annotated string) "false"
       | Tvar vs ->
           pp fmt "%a" print_vs vs;
           assert (vs.vs_ty = Option.get t_ty) (* TODO remove this *)
@@ -92,22 +95,29 @@ struct
           | Identifier.Prefix -> (
               match tl with
               (* partial application: zero argument *)
-              | [] -> pp fmt "((%a))%a" Ident.pp ls.ls_name print_ty t_ty
+              | [] -> pp fmt "(%a)" (annotated Ident.pp) ls.ls_name
               (* complete application: one or many arguments *)
               | _ ->
-                  pp fmt "((%a) %a)%a" Ident.pp ls.ls_name (list print_term) tl
-                    print_ty t_ty)
+                  let aux fmt (id, args) =
+                    pp fmt "%a %a" Ident.pp id (list print_term) args
+                  in
+                  pp fmt "%a" (annotated aux) (ls.ls_name, tl))
           | Identifier.Infix -> (
               match tl with
               (* partial applications: zero or one argument *)
-              | [] -> pp fmt "((%a))%a" Ident.pp_simpl ls.ls_name print_ty t_ty
+              | [] -> pp fmt "(%a)" (annotated Ident.pp_simpl) ls.ls_name
               | [ x ] ->
-                  pp fmt "((%a) %a)%a" Ident.pp_simpl ls.ls_name print_term x
-                    print_ty t_ty
+                  let aux fmt (id, arg) =
+                    pp fmt "(%a) %a" Ident.pp_simpl id print_term arg
+                  in
+                  pp fmt "%a" (annotated aux) (ls.ls_name, x)
               (* total application *)
               | [ x0; x1 ] ->
-                  pp fmt "(%a %a %a)%a" print_term x0 Ident.pp_simpl ls.ls_name
-                    print_term x1 print_ty t_ty
+                  let aux fmt (left, id, right) =
+                    pp fmt "%a %a %a" print_term left Ident.pp_simpl id
+                      print_term right
+                  in
+                  pp fmt "%a" (annotated aux) (x0, ls.ls_name, x1)
               | _ -> failwith "three-arguments infix symbols shouldn't happen")
           | Identifier.Mixfix -> (
               (* Mixfix symbols are only builtin so they neither begin nor ends
@@ -122,19 +132,24 @@ struct
               | 0 ->
                   let xs = List.combine tl exploded in
                   let aux fmt (a, s) = pp fmt "%a%s" print_term a s in
-                  pp fmt "(%a)%a" (list aux) xs print_ty t_ty
+                  pp fmt "%a" (annotated (list aux)) xs
               (* partial application *)
               | i when i < 0 ->
-                  pp fmt "((%a) %a)%a" Ident.pp ls.ls_name
-                    (list ~sep:sp print_term) tl print_ty t_ty
+                  let aux fmt (id, args) =
+                    pp fmt "(%a) %a" Ident.pp id (list ~sep:sp print_term) args
+                  in
+                  pp fmt "%a" (annotated aux) (ls.ls_name, tl)
               | _ ->
                   failwith
                     "No mixfix symbols are defined with an arity greater than \
                      the number of underscore + 1 ")
           | Identifier.Normal ->
-              pp fmt "(%a %a)%a" Ident.pp_simpl ls.ls_name
-                (list ~first:sp ~sep:sp print_term)
-                tl print_ty t_ty)
+              let aux fmt (id, args) =
+                pp fmt "%a%a" Ident.pp id
+                  (list ~first:sp ~sep:sp print_term)
+                  args
+              in
+              pp fmt "%a" (annotated aux) (ls.ls_name, tl))
       | Tfield (t, ls) ->
           pp fmt "(%a).%a" print_term t Ident.pp_simpl ls.ls_name
       | Tnot t -> pp fmt "not %a" print_term t
