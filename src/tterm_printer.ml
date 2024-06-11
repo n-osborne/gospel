@@ -152,8 +152,10 @@ struct
                   args
               in
               pp fmt "%a" (annotated aux) (ls.ls_name, tl))
-      | Tfield (t, ls) ->
-          pp fmt "(%a).%a" print_term t Ident.pp_simpl ls.ls_name
+      | Tfield (t, ls) -> (
+          match t.t_node with
+          | Tvar _ -> pp fmt "%a.%a" print_term t Ident.pp ls.ls_name
+          | _ -> pp fmt "(%a).%a" print_term t Ident.pp ls.ls_name)
       | Tnot t -> pp fmt "not %a" print_term t
       | Tif (t1, t2, t3) ->
           pp fmt "if %a then %a else %a" print_term t1 print_term t2 print_term

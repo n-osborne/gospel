@@ -35,4 +35,5 @@ Running `gospel check --dsource` to test pretty printing
   
   val f_2 : t -> t
   (*@ y_3 = f_2 x_4
-      ensures (y_3).m = (p x_4).m*)
+      ensures y_3.m = (p x_4).m*)
+
