@@ -46,9 +46,9 @@ Running `gospel check --dsource` to test pretty printing
   val f8 : t -> t list -> t
   (*@ r_1 = f8 x_6 xs_3
       ensures r_1 = match xs_3 with
-              | y_5 :: _ -> match y_5.m with
-                            | 42 -> x_6
-                            | _ -> y_5
+              | y_5 :: _ -> (match y_5.m with
+                             | 42 -> x_6
+                             | _ -> y_5)
               | [] -> x_6*)
 
 

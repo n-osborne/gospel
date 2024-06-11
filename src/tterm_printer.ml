@@ -176,11 +176,13 @@ struct
           pp fmt "fun %a -> %a" (list ~sep:sp print_pattern) pl print_term t
       | Tcase (t, ptl) ->
           let print_branch fmt (p, g, t) =
+            let f = match t.t_node with Tcase _ -> parens | _ -> Fun.id in
             match g with
-            | None -> pp fmt "| @[%a@] -> @[%a@]" print_pattern p print_term t
+            | None ->
+                pp fmt "| @[%a@] -> @[%a@]" print_pattern p (f print_term) t
             | Some g ->
                 pp fmt "| @[%a@] when @[%a@] -> @[%a@]" print_pattern p
-                  print_term g print_term t
+                  print_term g (f print_term) t
           in
           let aux fmt (case, branches) =
             pp fmt "match %a with@\n%a" print_term case
