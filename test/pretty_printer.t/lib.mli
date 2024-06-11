@@ -28,3 +28,12 @@ val g : t -> t list -> t
     ensures r = match xs with
                 | [] -> x
                 | y :: _ -> y *)
+
+(* Use nested pattern matching in specifications *)
+val f8 : t -> t list -> t
+(*@ r = f8 x xs
+    ensures r = match xs with
+                | y :: _ -> (match y.m with
+                             | 42 -> x
+                             | _ -> y)
+                | [] -> x *)
