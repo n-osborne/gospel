@@ -55,5 +55,11 @@ Running `gospel check --dsource` to test pretty printing
   (*@ type g = A of integer
                | B of bool * integer
             *)
+  
+  (*@ type r_2 = {a_1:integer; b:bool}
+              function constr#r (_:integer) (_:bool) : r_2
+              function a_1 (_:r_2) : integer
+              function b (_:r_2) : bool
+            *)
 
 

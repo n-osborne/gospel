@@ -40,4 +40,5 @@ val f8 : t -> t list -> t
 
 (* Ghost type declaration *)
 (*@ type g = A of integer | B of (bool * integer) *)
+(*@ type r = { a : integer; b : bool } *)
 
