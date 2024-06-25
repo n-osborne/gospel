@@ -57,6 +57,7 @@ module Ident : sig
     id_fixity : fixity;  (** The identifier fixity *)
     id_attrs : string list;  (** The attributes of the identifier. *)
     id_path : string list;  (** The full path of the identifier *)
+    id_relative_path : string list;  (** The relative path of the identifier *)
     id_loc : Location.t;  (** The location of the identifier. *)
     id_tag : int;  (** The unique tag of the identifier. *)
   }
@@ -95,6 +96,9 @@ module Ident : sig
 
   val add_attr : t -> string -> t
   (** [add_attr t attr] is [t] with [attr] added to the list of its attributes. *)
+
+  val update_relative_path : t -> string list -> t
+  (** [update_relative_path t path] is [t] with [path] as [id_relative_path]. *)
 end
 
 (** {2 Hard-coded identifiers} *)

@@ -37,6 +37,7 @@ module Ident = struct
     id_fixity : fixity;
     id_attrs : string list;
     id_path : string list;
+    id_relative_path : string list;
     id_loc : Location.t;
     id_tag : int;
   }
@@ -79,6 +80,7 @@ module Ident = struct
         id_fixity = fixity;
         id_attrs = attrs;
         id_path = path;
+        id_relative_path = [];
         id_loc = loc;
         id_tag = !tag;
       }
@@ -88,6 +90,7 @@ module Ident = struct
       ~loc:pid.pid_loc
 
   let set_loc t loc = { t with id_loc = loc }
+  let update_relative_path t p = { t with id_relative_path = p }
   let add_attr t attr = { t with id_attrs = attr :: t.id_attrs }
   let compare x y = Int.compare x.id_tag y.id_tag
   let equal x y = x.id_tag = y.id_tag
