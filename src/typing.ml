@@ -48,6 +48,11 @@ let string_list_of_qualid q =
   in
   fold_q [] q
 
+let flatten_qualid q = List.rev (string_list_of_qualid q)
+
+let ls_update_rel_path ls q =
+  { ls with ls_name = Ident.update_relative_path ls.ls_name (flatten_qualid q) }
+
 exception Ns_not_found of location * string
 
 let rec q_loc = function Qpreid pid -> pid.pid_loc | Qdot (q, _) -> q_loc q
@@ -334,7 +339,9 @@ let rec dterm whereami kid crcm ns denv { term_desc; term_loc = loc } : dterm =
             let dtv = mk_dterm ~loc (DTvar pid) (Some dty) in
             map_apply dtv tl
         | None -> fun_app ~loc (find_q_ls ns q) tl)
-    | _ -> fun_app ~loc (find_q_ls ns q) tl
+    | _ ->
+        let ls = ls_update_rel_path (find_q_ls ns q) q in
+        fun_app ~loc ls tl
   in
   let rec unfold_app t1 t2 tl =
     match t1.term_desc with
@@ -367,12 +374,12 @@ let rec dterm whereami kid crcm ns denv { term_desc; term_loc = loc } : dterm =
       mk_dterm ~loc (DTvar pid) (Some dty)
   | Uast.Tpreid q ->
       (* in this case it must be a constant *)
-      let ls = find_q_ls ns q in
+      let ls = ls_update_rel_path (find_q_ls ns q) q in
       if ls.ls_field then
         W.error ~loc (W.Symbol_not_found (string_list_of_qualid q));
       gen_app ~loc ls []
   | Uast.Tfield (t, q) ->
-      let ls = find_q_fd ns q in
+      let ls = ls_update_rel_path (find_q_fd ns q) q in
       if not ls.ls_field then
         W.error ~loc (W.Bad_record_field ls.ls_name.id_str);
       gen_app ~loc ls [ t ]
