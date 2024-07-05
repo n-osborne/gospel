@@ -24,7 +24,7 @@ Running `gospel check --dsource` to test pretty printing
   (*@ axiom mixfix: exists xs. xs[42] = 42 *)
   
   (*@ axiom mixfix_partial_application: exists xs_1. let f_1 = ([_.._]) 
-  xs_1 42 in Gospelstdlib.Sequence.mem
+  xs_1 42 in Sequence.mem
   f_1 73 42 *)
   
   type t
@@ -62,11 +62,11 @@ Running `gospel check --dsource` to test pretty printing
   
   type 'a ty
        (*@ ephemeral
-           mutable model m_1 : 'a sequence *)
+           mutable model m : 'a sequence *)
   
   val empty : unit -> 'a ty
   (*@ t_1 = empty ()
-      ensures t_1.m_1 = Gospelstdlib.Sequence.empty_1*)
+      ensures t_1.m = Sequence.empty*)
   $ gospel check --dsource lib.mli
   (*@ open Stdlib *)
   
@@ -82,7 +82,7 @@ Running `gospel check --dsource` to test pretty printing
   (*@ axiom mixfix: exists xs. xs[42] = 42 *)
   
   (*@ axiom mixfix_partial_application: exists xs_1. let f_1 = ([_.._]) 
-  xs_1 42 in Gospelstdlib.Sequence.mem
+  xs_1 42 in Sequence.mem
   f_1 73 42 *)
   
   type t
@@ -120,11 +120,11 @@ Running `gospel check --dsource` to test pretty printing
   
   type 'a ty
        (*@ ephemeral
-           mutable model m_1 : 'a sequence *)
+           mutable model m : 'a sequence *)
   
   val empty : unit -> 'a ty
   (*@ t_1 = empty ()
-      ensures t_1.m_1 = Gospelstdlib.Sequence.empty_1*)
+      ensures t_1.m = Sequence.empty*)
 
 
 

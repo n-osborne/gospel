@@ -34,9 +34,7 @@ struct
       (if is_func then " : " else "")
       (option print_ty) ls_value
 
-  let print_ls_nm fmt { ls_name; _ } =
-    pp fmt "%a" Ident.pp_last_with_tag ls_name
-
+  let print_ls_nm fmt { ls_name; _ } = pp fmt "%a" Ident.pp_relative ls_name
   let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
   let rec print_pat_node pri fmt p =
@@ -160,17 +158,15 @@ struct
               pp fmt "%a" (annotated (list ~sep:sp print_term)) tl
           | Identifier.Normal ->
               let aux fmt (id, args) =
-                pp fmt "%a%a" Ident.pp_full_with_tag id
+                pp fmt "%a%a" Ident.pp_relative id
                   (list ~first:sp ~sep:sp print_term)
                   args
               in
               pp fmt "%a" (annotated aux) (ls.ls_name, tl))
       | Tfield (t, ls) -> (
           match t.t_node with
-          | Tvar _ ->
-              pp fmt "%a.%a" print_term t Ident.pp_full_with_tag ls.ls_name
-          | _ -> pp fmt "(%a).%a" print_term t Ident.pp_full_with_tag ls.ls_name
-          )
+          | Tvar _ -> pp fmt "%a.%a" print_term t Ident.pp_relative ls.ls_name
+          | _ -> pp fmt "(%a).%a" print_term t Ident.pp_relative ls.ls_name)
       | Tnot t -> pp fmt "not %a" print_term t
       | Tif (t1, t2, t3) ->
           pp fmt "if %a then %a else %a" print_term t1 print_term t2 print_term
