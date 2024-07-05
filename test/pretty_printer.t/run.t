@@ -59,6 +59,14 @@ Running `gospel check --dsource` to test pretty printing
   
   (*@ type r_2 = { a_1 : integer; b : bool }
             *)
+  
+  type 'a ty
+       (*@ ephemeral
+           mutable model m_1 : 'a sequence *)
+  
+  val empty : unit -> 'a ty
+  (*@ t_1 = empty ()
+      ensures t_1.m_1 = Gospelstdlib.Sequence.empty_1*)
   $ gospel check --dsource lib.mli
   (*@ open Stdlib *)
   
@@ -109,9 +117,17 @@ Running `gospel check --dsource` to test pretty printing
   
   (*@ type r_2 = { a_1 : integer; b : bool }
             *)
+  
+  type 'a ty
+       (*@ ephemeral
+           mutable model m_1 : 'a sequence *)
+  
+  val empty : unit -> 'a ty
+  (*@ t_1 = empty ()
+      ensures t_1.m_1 = Gospelstdlib.Sequence.empty_1*)
 
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 795796e (Add third mode to identifiers pretty printer)
+
+
+

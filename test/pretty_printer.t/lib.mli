@@ -42,3 +42,11 @@ val f8 : t -> t list -> t
 (*@ type g = A of integer | B of (bool * integer) *)
 (*@ type r = { a : integer; b : bool } *)
 
+(* Relative paths *)
+type 'a ty
+(*@ mutable model m : 'a Sequence.t *)
+
+val empty : unit -> 'a ty
+(*@ t = empty ()
+    ensures t.m = Sequence.empty *)
+
