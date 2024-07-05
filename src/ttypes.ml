@@ -13,9 +13,13 @@ open Ppxlib
 open Utils
 module Ident = Identifier.Ident
 
+type ident = Ident.t
+
+let pp_ident = Ident.pp_full_with_tag
+
 (** type variables *)
 
-type tvsymbol = { tv_name : Ident.t } [@@deriving show]
+type tvsymbol = { tv_name : ident } [@@deriving show]
 
 let tv_equal x y = Ident.equal x.tv_name y.tv_name
 
@@ -50,7 +54,7 @@ and ty_node = Tyvar of tvsymbol | Tyapp of tysymbol * ty list
 [@@deriving show]
 
 and tysymbol = {
-  ts_ident : Ident.t;
+  ts_ident : ident;
   ts_args : tvsymbol list;
   (* we need to keep variables to do things like
      type ('a,'b) t1  type ('a,'b) t2 = ('b,'a) t1 *)
@@ -271,10 +275,10 @@ type exn_type =
        -> Exn_tuple [int_ty;int_ty]
      exception E of (int*int)
        -> Exn_tuple [Tyapp (ts_tuple 2) [ty_int;ty_int]] *)
-  | Exn_record of (Ident.t * ty) list
+  | Exn_record of (ident * ty) list
 [@@deriving show]
 
-type xsymbol = { xs_ident : Ident.t; xs_type : exn_type } [@@deriving show]
+type xsymbol = { xs_ident : ident; xs_type : exn_type } [@@deriving show]
 
 let xsymbol id ty = { xs_ident = id; xs_type = ty }
 let xs_equal x y = Ident.equal x.xs_ident y.xs_ident
@@ -315,9 +319,9 @@ open Fmt
 let print_tv fmt tv =
   pp fmt
     (if tv.tv_name.id_str = "_" then "%a" else "'%a")
-    Ident.pp_simpl tv.tv_name
+    Ident.pp_last tv.tv_name
 
-let print_ts_name fmt ts = pp fmt "@[%a@]" Ident.pp_simpl (ts_ident ts)
+let print_ts_name fmt ts = pp fmt "@[%a@]" Ident.pp_last (ts_ident ts)
 
 let rec print_ty fmt { ty_node } = print_ty_node fmt ty_node
 and print_arrow_ty fmt = list ~sep:arrow print_ty fmt
@@ -335,7 +339,7 @@ and print_ty_node fmt = function
 let print_ts fmt ts =
   pp fmt "@[%a %a%a@]"
     (list ~sep:comma ~first:lparens ~last:rparens print_tv)
-    ts.ts_args Ident.pp_simpl (ts_ident ts)
+    ts.ts_args Ident.pp_last (ts_ident ts)
     (fun fmt alias ->
       match alias with None -> () | Some ty -> pp fmt " [=%a]" print_ty ty)
     ts.ts_alias
@@ -343,7 +347,7 @@ let print_ts fmt ts =
 let print_exn_type f = function
   | Exn_tuple tyl -> list ~sep:star print_ty f tyl
   | Exn_record args ->
-      let print_arg f (id, ty) = pp f "%a:%a" Ident.pp_simpl id print_ty ty in
+      let print_arg f (id, ty) = pp f "%a:%a" Ident.pp_last id print_ty ty in
       list ~sep:semi ~first:rbrace ~last:lbrace print_arg f args
 
-let print_xs f x = pp f "%a" Ident.pp_simpl x.xs_ident
+let print_xs f x = pp f "%a" Ident.pp_last x.xs_ident

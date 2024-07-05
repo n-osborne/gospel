@@ -13,7 +13,7 @@ open Ttypes
 module Ident = Identifier.Ident
 
 (* Variable Symbols *)
-type vsymbol = { vs_name : Ident.t; vs_ty : ty } [@@deriving show]
+type vsymbol = { vs_name : ident; vs_ty : ty } [@@deriving show]
 
 let create_vsymbol ?(path = []) pid ty =
   { vs_name = Ident.of_preid ~path pid; vs_ty = ty }
@@ -30,7 +30,7 @@ module Mvs = Map.Make (Vs)
 (* Function and predicate symbols *)
 
 type lsymbol = {
-  ls_name : Ident.t;
+  ls_name : ident;
   ls_args : ty list;
   ls_value : ty option;
   ls_constr : bool;

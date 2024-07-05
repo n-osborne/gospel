@@ -67,11 +67,26 @@ module Ident : sig
   val equal : t -> t -> bool
   val hash : t -> int
 
-  val pp_simpl : Format.formatter -> t -> unit
-  (** [pp fmt id] pretty prints [id] *)
+  val pp_last : Format.formatter -> t -> unit
+  (** [pp_last fmt id] pretty prints [id] *)
 
-  val pp : Format.formatter -> t -> unit
-  (** [pp fmt id] pretty prints [id] with their fully qualified name *)
+  val pp_relative : Format.formatter -> t -> unit
+  (** [pp_relative fmt id] pretty prints [id] with their realtive path *)
+
+  val pp_full : Format.formatter -> t -> unit
+  (** [pp_full fmt id] pretty prints [id] with their fully resolved path *)
+
+  val pp_last_with_tag : Format.formatter -> t -> unit
+  (** [pp_last_with_tag fmt id] pretty prints [id] with its generated tag to
+      guarantee uniqueness *)
+
+  val pp_relative_with_tag : Format.formatter -> t -> unit
+  (** [pp_relative_with_tag fmt id] pretty prints [id] with their realtive path
+      with its generated tag to guarantee uniqueness *)
+
+  val pp_full_with_tag : Format.formatter -> t -> unit
+  (** [pp_full_with_tag fmt id] pretty prints [id] with their fully resolved
+      path with its tag to guarantee uniqueness *)
 
   val create :
     ?fixity:fixity ->

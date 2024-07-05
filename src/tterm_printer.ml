@@ -19,21 +19,24 @@ module Make (S : sig
 end) =
 struct
   let print_vs fmt { vs_name; vs_ty } =
-    if S.annot then pp fmt "@[(%a:%a)@]" Ident.pp_simpl vs_name print_ty vs_ty
-    else pp fmt "@[%a@]" Ident.pp_simpl vs_name
+    if S.annot then
+      pp fmt "@[(%a:%a)@]" Ident.pp_last_with_tag vs_name print_ty vs_ty
+    else pp fmt "@[%a@]" Ident.pp_last_with_tag vs_name
 
   let print_ls_decl fmt { ls_name; ls_args; ls_value; _ } =
     let is_func = Option.is_some ls_value in
     let print_unnamed_arg fmt ty = pp fmt "(_:%a)" print_ty ty in
     pp fmt "%s %a %a%s%a"
       (if is_func then "function" else "predicate")
-      Ident.pp_simpl ls_name
+      Ident.pp_last_with_tag ls_name
       (list ~sep:sp print_unnamed_arg)
       ls_args
       (if is_func then " : " else "")
       (option print_ty) ls_value
 
-  let print_ls_nm fmt { ls_name; _ } = pp fmt "%a" Ident.pp_simpl ls_name
+  let print_ls_nm fmt { ls_name; _ } =
+    pp fmt "%a" Ident.pp_last_with_tag ls_name
+
   let protect_on x s = if x then "(" ^^ s ^^ ")" else s
 
   let rec print_pat_node pri fmt p =
@@ -100,26 +103,29 @@ struct
           | Identifier.Prefix -> (
               match tl with
               (* partial application: zero argument *)
-              | [] -> pp fmt "(%a)" (annotated Ident.pp) ls.ls_name
+              | [] ->
+                  pp fmt "(%a)" (annotated Ident.pp_full_with_tag) ls.ls_name
               (* complete application: one or many arguments *)
               | _ ->
                   let aux fmt (id, args) =
-                    pp fmt "%a %a" Ident.pp id (list print_term) args
+                    pp fmt "%a %a" Ident.pp_full_with_tag id (list print_term)
+                      args
                   in
                   pp fmt "%a" (annotated aux) (ls.ls_name, tl))
           | Identifier.Infix -> (
               match tl with
               (* partial applications: zero or one argument *)
-              | [] -> pp fmt "(%a)" (annotated Ident.pp_simpl) ls.ls_name
+              | [] ->
+                  pp fmt "(%a)" (annotated Ident.pp_last_with_tag) ls.ls_name
               | [ x ] ->
                   let aux fmt (id, arg) =
-                    pp fmt "(%a) %a" Ident.pp_simpl id print_term arg
+                    pp fmt "(%a) %a" Ident.pp_last_with_tag id print_term arg
                   in
                   pp fmt "%a" (annotated aux) (ls.ls_name, x)
               (* total application *)
               | [ x0; x1 ] ->
                   let aux fmt (left, id, right) =
-                    pp fmt "%a %a %a" print_term left Ident.pp_simpl id
+                    pp fmt "%a %a %a" print_term left Ident.pp_last_with_tag id
                       print_term right
                   in
                   pp fmt "%a" (annotated aux) (x0, ls.ls_name, x1)
@@ -129,7 +135,8 @@ struct
                  with an underscore character. They also assume that the first
                  argument appear before the symbol. *)
               let exploded =
-                String.split_on_char '_' (str "%a" Ident.pp ls.ls_name)
+                String.split_on_char '_'
+                  (str "%a" Ident.pp_last_with_tag ls.ls_name)
               in
               match Int.compare (List.length tl) (List.length exploded) with
               (* complete application: one argument before the symbol and then
@@ -141,7 +148,8 @@ struct
               (* partial application *)
               | i when i < 0 ->
                   let aux fmt (id, args) =
-                    pp fmt "(%a) %a" Ident.pp id (list ~sep:sp print_term) args
+                    pp fmt "(%a) %a" Ident.pp_full_with_tag id
+                      (list ~sep:sp print_term) args
                   in
                   pp fmt "%a" (annotated aux) (ls.ls_name, tl)
               | _ ->
@@ -152,15 +160,17 @@ struct
               pp fmt "%a" (annotated (list ~sep:sp print_term)) tl
           | Identifier.Normal ->
               let aux fmt (id, args) =
-                pp fmt "%a%a" Ident.pp id
+                pp fmt "%a%a" Ident.pp_full_with_tag id
                   (list ~first:sp ~sep:sp print_term)
                   args
               in
               pp fmt "%a" (annotated aux) (ls.ls_name, tl))
       | Tfield (t, ls) -> (
           match t.t_node with
-          | Tvar _ -> pp fmt "%a.%a" print_term t Ident.pp ls.ls_name
-          | _ -> pp fmt "(%a).%a" print_term t Ident.pp ls.ls_name)
+          | Tvar _ ->
+              pp fmt "%a.%a" print_term t Ident.pp_full_with_tag ls.ls_name
+          | _ -> pp fmt "(%a).%a" print_term t Ident.pp_full_with_tag ls.ls_name
+          )
       | Tnot t -> pp fmt "not %a" print_term t
       | Tif (t1, t2, t3) ->
           pp fmt "if %a then %a else %a" print_term t1 print_term t2 print_term

@@ -42,6 +42,8 @@ module Ident = struct
     id_tag : int;
   }
 
+  type pp_mode = Full | Relative | Last
+
   let pp =
     let current = Hashtbl.create 0 in
     let output = Hashtbl.create 0 in
@@ -50,26 +52,37 @@ module Ident = struct
       Hashtbl.replace current s x;
       x
     in
-    let str_of_id path id =
+    let str_of_id tag mode id =
       try Hashtbl.find output id.id_tag
       with Not_found ->
         let x = current id.id_str in
         let str =
-          if x = 0 then id.id_str else id.id_str ^ "_" ^ string_of_int x
+          if tag && x <> 0 then id.id_str ^ "_" ^ string_of_int x else id.id_str
         in
         let str =
-          if path then
-            List.fold_right (fun e acc -> e ^ "." ^ acc) id.id_path str
-          else str
+          match mode with
+          | Full -> List.fold_right (fun e acc -> e ^ "." ^ acc) id.id_path str
+          | Relative -> (
+              match id.id_relative_path with
+              | [] -> str
+              | _ :: xs -> String.concat "." (List.rev (str :: xs)))
+          | Last -> str
         in
         Hashtbl.replace output id.id_tag str;
         str
     in
-    fun path ppf t ->
-      Format.fprintf ppf "%s%a" (str_of_id path t) pp_attrs t.id_attrs
+    fun tag mode ppf t ->
+      Format.fprintf ppf "%s%a" (str_of_id tag mode t) pp_attrs t.id_attrs
 
-  let pp_simpl = pp false
-  let pp = pp true
+  let pp = pp false
+  and pp_with_tag = pp true
+
+  let pp_last = pp Last
+  let pp_relative = pp Relative
+  let pp_full = pp Full
+  let pp_last_with_tag = pp_with_tag Last
+  let pp_relative_with_tag = pp_with_tag Relative
+  let pp_full_with_tag = pp_with_tag Full
 
   let create =
     let tag = ref 0 in

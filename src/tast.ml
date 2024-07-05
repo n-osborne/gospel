@@ -43,7 +43,7 @@ type val_spec = {
 [@@deriving show]
 
 type val_description = {
-  vd_name : Ident.t;
+  vd_name : ident;
   vd_type : core_type; [@printer Pprintast.core_type]
   vd_prim : string list;  (** primitive declaration *)
   vd_attrs : attributes; [@printer fun fmt _ -> fprintf fmt "<attributes>"]
@@ -86,7 +86,7 @@ type constructor_decl = {
   cd_cs : lsymbol;
   (* constructor *)
   (* cd_ld is empty if defined through a tuple *)
-  cd_ld : (Ident.t * ty) label_declaration list;
+  cd_ld : (ident * ty) label_declaration list;
   cd_loc : Location.t; [@printer Utils.Fmt.pp_loc]
   cd_attrs : attributes; [@printer fun fmt _ -> fprintf fmt "<attributes>"]
       (* C of ... [@id1] [@id2] *)
@@ -130,7 +130,7 @@ type type_declaration = {
 [@@deriving show]
 
 type axiom = {
-  ax_name : Ident.t;  (** Name *)
+  ax_name : ident;  (** Name *)
   ax_term : term;  (** Definition *)
   ax_loc : Location.t; [@printer Utils.Fmt.pp_loc]  (** Location *)
   ax_text : string;
@@ -163,7 +163,7 @@ type function_ = {
 [@@deriving show]
 
 type extension_constructor = {
-  ext_ident : Ident.t;
+  ext_ident : ident;
   ext_xs : xsymbol;
   ext_kind : extension_constructor_kind;
       [@printer fun fmt _ -> fprintf fmt "<extension_constructor_kind>"]
@@ -186,16 +186,16 @@ type rec_flag = Nonrecursive | Recursive [@@deriving show]
 type ghost = Nonghost | Ghost [@@deriving show]
 
 type with_constraint =
-  | Wty of Ident.t * type_declaration
+  | Wty of ident * type_declaration
   (* with type X.t = ...
 
      Note: the last component of the longIdent.t must match
      the name of the type_declaration. *)
-  | Wmod of Ident.t * Ident.t
+  | Wmod of ident * ident
   (* with module X.Y = Z *)
-  | Wtysubs of Ident.t * type_declaration
+  | Wtysubs of ident * type_declaration
   (* with type X.t := ..., same format as [Pwith_type] *)
-  | Wmodsubs of Ident.t * Ident.t
+  | Wmodsubs of ident * ident
 (* with module X.Y := Z *)
 [@@deriving show]
 
@@ -264,7 +264,7 @@ and signature_item_desc =
 [@@deriving show]
 
 and module_declaration = {
-  md_name : Ident.t;
+  md_name : ident;
   md_type : module_type;
   md_attrs : attributes; [@printer fun fmt _ -> fprintf fmt "<attributes>"]
   (* ... [@@id1] [@@id2] *)
@@ -273,7 +273,7 @@ and module_declaration = {
 [@@deriving show]
 
 and module_type_declaration = {
-  mtd_name : Ident.t;
+  mtd_name : ident;
   mtd_type : module_type option;
   mtd_attrs : attributes; [@printer fun fmt _ -> fprintf fmt "<attributes>"]
   (* ... [@@id1] [@@id2] *)
@@ -294,7 +294,7 @@ and module_type_desc =
   (* S *)
   | Mod_signature of signature
   (* sig ... end *)
-  | Mod_functor of Ident.t * module_type option * module_type
+  | Mod_functor of ident * module_type option * module_type
   (* functor(X : MT1) -> MT2 *)
   | Mod_with of module_type * with_constraint list
   (* MT with ... *)
