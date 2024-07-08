@@ -61,8 +61,12 @@ struct
     if (not ty_ephemeral) && ty_fields = [] && Option.is_none ty_invariants then
       ()
     else
-      let print_ephemeral f e = if e then pp f "@[ephemeral@]" in
-      let print_term f t = pp f "@[%a@]" print_term t in
+      let print_ephemeral f e =
+        if e then pf f "@[%a@]" (string ++ newline) "ephemeral"
+      in
+      (* Some box should have been opened without closing in [print_term]
+         TODO: remove the second [@]] when this is fixed *)
+      let print_term f t = pp f "@[%a@]@]" print_term t in
       let print_field f (ls, mut) =
         pp f "@[%s%a : %a@]"
           (if mut then "mutable model " else "model ")
@@ -70,20 +74,16 @@ struct
           (Stdlib.Option.get ls.ls_value)
       in
       let print_invariants ppf i =
-        pf ppf "with %a@;%a" print_vs (fst i)
+        pf ppf "%a%a@ %a" (newline ++ string) "with " print_vs (fst i)
           (list
-             ~first:(newline ++ const string "invariant ")
-             ~sep:(const string "@\ninvariant")
+             ~first:(const string "invariant ")
+             ~sep:(newline ++ const string "invariant ")
              print_term)
           (snd i)
       in
       pp fmt "(*@@ @[%a%a%a@] *)" print_ephemeral ty_ephemeral
-        (list ~first:newline ~sep:newline print_field)
-        ty_fields
-        (* (option print_invariant_vs) *)
-        (* ty_invariants *)
-        (option print_invariants)
-        ty_invariants
+        (list ~sep:newline print_field)
+        ty_fields (option print_invariants) ty_invariants
 
   let print_type_declaration fmt td =
     let print_param fmt (tv, (v, i)) =

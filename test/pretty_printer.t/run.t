@@ -127,11 +127,10 @@ Running `gospel check --dsource` to test pretty printing
       ensures t_1.m = Sequence.empty*)
   
   type my_list
-       (*@ 
-           model contents : integer sequencewith l
-           
-           invariant Sequence.mem l.contents 42@
-  invariantnot l.contents = Sequence.empty *)
+       (*@ model contents : integer sequence
+           with l
+           invariant Sequence.mem l.contents 42
+           invariant not l.contents = Sequence.empty *)
 
 
 
