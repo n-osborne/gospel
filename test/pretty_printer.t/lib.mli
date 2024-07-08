@@ -50,3 +50,8 @@ val empty : unit -> 'a ty
 (*@ t = empty ()
     ensures t.m = Sequence.empty *)
 
+(* invariant *)
+type my_list
+(*@ model contents : integer Sequence.t
+    with l invariant Sequence.mem l.contents 42
+           invariant l.contents <> Sequence.empty *)
