@@ -79,7 +79,8 @@ struct
     | Texists -> pp fmt "exists"
 
   (* TODO use pretty printer from why3 *)
-  let rec print_term fmt { t_node; t_ty; t_attrs; _ } =
+  let rec print_term par fmt { t_node; t_ty; t_attrs; _ } =
+    let paren = if par then parens else Fun.id in
     let print_ty fmt ty =
       match ty with
       | None -> pp fmt ":prop"
@@ -106,10 +107,11 @@ struct
               (* complete application: one or many arguments *)
               | _ ->
                   let aux fmt (id, args) =
-                    pp fmt "%a %a" Ident.pp_full_with_tag id (list print_term)
+                    pp fmt "%a %a" Ident.pp_full_with_tag id
+                      (list (print_term true))
                       args
                   in
-                  pp fmt "%a" (annotated aux) (ls.ls_name, tl))
+                  pp fmt "%a" (paren (annotated aux)) (ls.ls_name, tl))
           | Identifier.Infix -> (
               match tl with
               (* partial applications: zero or one argument *)
@@ -117,16 +119,18 @@ struct
                   pp fmt "(%a)" (annotated Ident.pp_last_with_tag) ls.ls_name
               | [ x ] ->
                   let aux fmt (id, arg) =
-                    pp fmt "(%a) %a" Ident.pp_last_with_tag id print_term arg
+                    pp fmt "(%a) %a" Ident.pp_last_with_tag id (print_term true)
+                      arg
                   in
-                  pp fmt "%a" (annotated aux) (ls.ls_name, x)
+                  pp fmt "%a" (paren (annotated aux)) (ls.ls_name, x)
               (* total application *)
               | [ x0; x1 ] ->
+                  let par = not Symbols.(ls_equal ls ps_equ) in
                   let aux fmt (left, id, right) =
-                    pp fmt "%a %a %a" print_term left Ident.pp_last_with_tag id
-                      print_term right
+                    pp fmt "%a %a %a" (print_term par) left
+                      Ident.pp_last_with_tag id (print_term par) right
                   in
-                  pp fmt "%a" (annotated aux) (x0, ls.ls_name, x1)
+                  pp fmt "%a" (paren (annotated aux)) (x0, ls.ls_name, x1)
               | _ -> failwith "three-arguments infix symbols shouldn't happen")
           | Identifier.Mixfix -> (
               (* Mixfix symbols are only builtin so they neither begin nor ends
@@ -141,63 +145,98 @@ struct
                  one for each underscore *)
               | 0 ->
                   let xs = List.combine tl exploded in
-                  let aux fmt (a, s) = pp fmt "%a%s" print_term a s in
-                  pp fmt "%a" (annotated (list aux)) xs
+                  (* TODO: in theory no need to pernethsize all the argument,
+                     only the first one *)
+                  let aux fmt (a, s) = pp fmt "%a%s" (print_term true) a s in
+                  pp fmt "%a" (paren (annotated (list aux))) xs
               (* partial application *)
               | i when i < 0 ->
                   let aux fmt (id, args) =
                     pp fmt "(%a) %a" Ident.pp_full_with_tag id
-                      (list ~sep:sp print_term) args
+                      (list ~sep:sp (print_term true))
+                      args
                   in
-                  pp fmt "%a" (annotated aux) (ls.ls_name, tl)
+                  pp fmt "%a" (paren (annotated aux)) (ls.ls_name, tl)
               | _ ->
                   failwith
                     "No mixfix symbols are defined with an arity greater than \
                      the number of underscore + 1 ")
           | Identifier.Normal when ls_equal ls Symbols.fs_apply ->
-              pp fmt "%a" (annotated (list ~sep:sp print_term)) tl
+              pp fmt "%a"
+                (paren (annotated (list ~sep:sp (print_term true))))
+                tl
           | Identifier.Normal ->
               let aux fmt (id, args) =
                 pp fmt "%a%a" Ident.pp_relative id
-                  (list ~first:sp ~sep:sp print_term)
+                  (list ~first:sp ~sep:sp (print_term true))
                   args
               in
-              pp fmt "%a" (annotated aux) (ls.ls_name, tl))
-      | Tfield (t, ls) -> (
-          match t.t_node with
-          | Tvar _ -> pp fmt "%a.%a" print_term t Ident.pp_relative ls.ls_name
-          | _ -> pp fmt "(%a).%a" print_term t Ident.pp_relative ls.ls_name)
-      | Tnot t -> pp fmt "not %a" print_term t
+              pp fmt "%a" (paren (annotated aux)) (ls.ls_name, tl))
+      | Tfield (t, ls) ->
+          pp fmt "%a.%a" (print_term true) t Ident.pp_relative ls.ls_name
+      | Tnot t ->
+          let par = match t.t_node with Tbinop _ -> true | _ -> false in
+          let aux fmt t = pp fmt "not %a" (print_term par) t in
+          pp fmt "%a" (paren aux) t
       | Tif (t1, t2, t3) ->
-          pp fmt "if %a then %a else %a" print_term t1 print_term t2 print_term
-            t3
+          let aux fmt (t1, t2, t3) =
+            pp fmt "if %a then %a else %a" (print_term false) t1
+              (print_term false) t2 (print_term false) t3
+          in
+          pp fmt "%a" (paren aux) (t1, t2, t3)
       | Tlet (vs, t1, t2) ->
-          pp fmt "let %a = %a in %a" print_vs vs print_term t1 print_term t2
+          let aux fmt (vs, t1, t2) =
+            pp fmt "let %a = %a in %a" print_vs vs (print_term false) t1
+              (print_term false) t2
+          in
+          pp fmt "%a" (paren aux) (vs, t1, t2)
       | Tbinop (op, t1, t2) ->
-          pp fmt "%a %a %a" print_term t1 print_binop op print_term t2
+          let par1 = match t1.t_node with Tbinop _ -> true | _ -> false
+          and par2 = match t2.t_node with Tbinop _ -> true | _ -> false in
+          let aux fmt (t1, op, t2) =
+            pp fmt "%a %a %a" (print_term par1) t1 print_binop op
+              (print_term par2) t2
+          in
+          pp fmt "%a" (paren aux) (t1, op, t2)
       | Tquant (q, vsl, t) ->
-          pp fmt "%a %a. %a" print_quantifier q (list ~sep:sp print_vs) vsl
-            print_term t
+          let aux fmt (q, vsl, t) =
+            pp fmt "%a %a. %a" print_quantifier q (list ~sep:sp print_vs) vsl
+              (print_term false) t
+          in
+          pp fmt "%a" (paren aux) (q, vsl, t)
       | Tlambda (pl, t) ->
-          pp fmt "fun %a -> %a" (list ~sep:sp print_pattern) pl print_term t
+          let aux fmt (pl, t) =
+            pp fmt "fun %a -> %a"
+              (list ~sep:sp print_pattern)
+              pl (print_term false) t
+          in
+          pp fmt "%a" (paren aux) (pl, t)
       | Tcase (t, ptl) ->
           let print_branch fmt (p, g, t) =
             let f = match t.t_node with Tcase _ -> parens | _ -> Fun.id in
             match g with
             | None ->
-                pp fmt "| @[%a@] -> @[%a@]" print_pattern p (f print_term) t
+                pp fmt "| @[%a@] -> @[%a@]" print_pattern p
+                  (f (print_term false))
+                  t
             | Some g ->
                 pp fmt "| @[%a@] when @[%a@] -> @[%a@]" print_pattern p
-                  print_term g (f print_term) t
+                  (print_term false) g
+                  (f (print_term false))
+                  t
           in
           let aux fmt (case, branches) =
-            pp fmt "match %a with@\n%a" print_term case
+            pp fmt "match %a with@\n%a" (print_term false) case
               (list ~sep:newline print_branch)
               branches
           in
-          pp fmt "%a" (annotated aux) (t, ptl)
-      | Told t -> pp fmt "old (%a)" print_term t
+          pp fmt "%a" (paren (annotated aux)) (t, ptl)
+      | Told t ->
+          let aux fmt t = pp fmt "old %a" (print_term true) t in
+          pp fmt "%a" (paren aux) t
     in
     let print_attrs fmt = List.iter (pp fmt "[%@ %s]") in
     pp fmt "%a%a" print_attrs t_attrs print_t_node t_node
+
+  let print_term = print_term false
 end
