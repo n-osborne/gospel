@@ -55,3 +55,13 @@ type my_list
 (*@ model contents : integer Sequence.t
     with l invariant Sequence.mem l.contents 42
            invariant l.contents <> Sequence.empty *)
+
+(* let binding *)
+val f9 : 'a ty -> 'a ty
+(*@ r = f9 x
+    ensures let m = old x.m in x.m = m *)
+
+(* lambda binding *)
+val f10 : int ty list -> int ty list
+(*@ r = f10 x
+    ensures r = List.map (fun y -> y) x *)
