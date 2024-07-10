@@ -70,3 +70,6 @@ val f10 : int ty list -> int ty list
 (*@ axiom a : forall x y z. (x < y \/ y < z) /\ (x = 42 -> y = 73) *)
 (*@ axiom b : forall x y z. (x < y || y < z) && (x = 42 -> y = 73) *)
 (*@ axiom c : forall x y z. (x + 3 < y || y < z) && (x + y = 42 -> y = 73) *)
+
+(*@ open Gospelstdlib *)
+(*@ open Stdlib *)

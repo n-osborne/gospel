@@ -341,6 +341,22 @@ struct
     | _ -> assert false
 
   and print_signature f x =
+    let filter_first_opens =
+      let is_open m s =
+        match s.sig_desc with
+        | Sig_open (od, Ghost) -> List.mem m od.opn_id
+        | _ -> false
+      in
+      let rec aux stdlib gospelstdlib = function
+        | [] -> []
+        | x :: xs when stdlib && is_open "Stdlib" x -> aux false gospelstdlib xs
+        | x :: xs when gospelstdlib && is_open "Gospelstdlib" x ->
+            aux stdlib false xs
+        | x :: xs -> x :: aux stdlib gospelstdlib xs
+      in
+      aux true true
+    in
+    let x =filter_first_opens x in
     list ~sep:(newline ++ newline) print_signature_item f x
 
   and print_module_type f x =
