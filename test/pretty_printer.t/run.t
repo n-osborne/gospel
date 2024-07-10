@@ -147,6 +147,15 @@ Running `gospel check --dsource` to test pretty printing
   val f10 : int ty list -> int ty list
   (*@ r_4 = f10 x_8
       ensures r_4 = List.map (fun y_6 -> y_6) x_8*)
+  
+  (*@ axiom a_2: forall x_9 y_7 z. (x_9 < y_7 \/ y_7 < z) /\ (x_9 = 42 -> 
+                                                              y_7 = 73) *)
+  
+  (*@ axiom b_1: forall x_10 y_8 z_1. (x_10 < y_8 || y_8 < z_1) && (x_10 = 42 -> 
+                                                                    y_8 = 73) *)
+  
+  (*@ axiom c: forall x_11 y_9 z_2. ((x_11 + 3) < y_9 || y_9 < z_2) && 
+  (x_11 + y_9 = 42 -> y_9 = 73) *)
 
 
 
