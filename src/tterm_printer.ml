@@ -27,8 +27,7 @@ let print_ls_decl fmt ls =
     (if is_pred then "predicate" else "function")
     Ident.pp_simpl ls_name
     (list ~sep:sp print_unnamed_arg)
-    ls_args
-    print_ty ls_value
+    ls_args print_ty ls_value
 
 let print_ls_nm fmt ls = pp fmt "%a" Ident.pp_simpl (get_name ls)
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
@@ -90,6 +89,11 @@ let rec print_term fmt { t_node; t_ty; t_attrs; _ } =
           tl print_ty t_ty
     | Tfield (t, ls) ->
         pp fmt "(%a).%a" print_term t Ident.pp_simpl (get_name ls)
+    | Trecord rd ->
+        let aux fmt (ls, t) =
+          pp fmt "%a = %a" Ident.pp_simpl (get_name ls) print_term t
+        in
+        pp fmt "{ %a }" (list ~sep:semi aux) rd
     | Tnot t -> pp fmt "not %a" print_term t
     | Tif (t1, t2, t3) ->
         pp fmt "if %a then %a else %a" print_term t1 print_term t2 print_term t3
