@@ -24,8 +24,7 @@ let print_ls_decl fmt { ls_name; ls_args; ls_value; _ } =
     (if is_pred then "predicate" else "function")
     Ident.pp_simpl ls_name
     (list ~sep:sp print_unnamed_arg)
-    ls_args
-    print_ty ls_value
+    ls_args print_ty ls_value
 
 let print_ls_nm fmt { ls_name; _ } = pp fmt "%a" Ident.pp_simpl ls_name
 let protect_on x s = if x then "(" ^^ s ^^ ")" else s
