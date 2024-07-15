@@ -95,7 +95,7 @@ type constructor_decl = {
 
 type type_kind =
   | Pty_abstract
-  | Pty_variant of constructor_decl list  (** Invariant: non-empty list *)
+  | Pty_variant of constructor_decl list
   | Pty_record of rec_declaration
 [@@deriving show]
 
