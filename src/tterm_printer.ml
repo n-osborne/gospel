@@ -86,6 +86,11 @@ let rec print_term fmt { t_node; t_ty; t_attrs; _ } =
           (list ~first:sp ~sep:sp print_term)
           tl print_ty t_ty
     | Tfield (t, ls) -> pp fmt "(%a).%a" print_term t Ident.pp_simpl ls.ls_name
+    | Trecord rd ->
+        let aux fmt (ls, t) =
+          pp fmt "%a = %a" Ident.pp_simpl ls.ls_name print_term t
+        in
+        pp fmt "{ %a }" (list ~sep:semi aux) rd
     | Tnot t -> pp fmt "not %a" print_term t
     | Tif (t1, t2, t3) ->
         pp fmt "if %a then %a else %a" print_term t1 print_term t2 print_term t3

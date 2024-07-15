@@ -65,6 +65,9 @@ let rec t_free_vars t =
   | Tapp (_, tl) ->
       List.fold_left (fun fvs t -> Svs.union (t_free_vars t) fvs) Svs.empty tl
   | Tfield (t, _) -> t_free_vars t
+  | Trecord xs ->
+      let aux fvs (_, t) = Svs.union (t_free_vars t) fvs in
+      List.fold_left aux Svs.empty xs
   | Tif (t1, t2, t3) ->
       Svs.union (t_free_vars t1) (Svs.union (t_free_vars t2) (t_free_vars t3))
   | Tlet (vs, t1, t2) ->

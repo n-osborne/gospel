@@ -59,6 +59,7 @@ and term_node =
   | Tconst of constant [@printer fun fmt _ -> fprintf fmt "<constant>"]
   | Tapp of lsymbol * term list
   | Tfield of term * lsymbol
+  | Trecord of (lsymbol * term) list
   | Tif of term * term * term
   | Tlet of vsymbol * term * term
   | Tcase of term * (pattern * term option * term) list
