@@ -527,12 +527,17 @@ let rec dterm whereami kid crcm ns denv { term_desc; term_loc = loc } : dterm =
           mk_dterm ~loc (DTold dt) (Option.get dt.dt_dty))
   | Uast.Trecord qtl ->
       let cs, pjl, fll = parse_record ~loc kid ns qtl in
-      let get_term pj =
-        try dterm whereami kid crcm ns denv (Mls.find pj fll)
-        with Not_found ->
-          W.error ~loc (W.Unknown_record_field (get_name pj).id_str)
+      let dtyl, dty = specialize_ls cs in
+      let aux ls dty =
+        let dt =
+          try dterm whereami kid crcm ns denv (Mls.find ls fll)
+          with Not_found ->
+            W.error ~loc (W.Unknown_record_field (get_name ls).id_str)
+        in
+        (ls, dterm_expected crcm dt dty)
       in
-      mk_app ~loc cs (List.map get_term pjl)
+      let xs = List.map2 aux pjl dtyl in
+      mk_dterm ~loc (DTrecord xs) dty
   | Uast.Tupdate (t, qtl) ->
       let cs, pjl, fll = parse_record ~loc kid ns qtl in
       let get_term pj =
