@@ -35,6 +35,7 @@ and dterm_node =
   | DTvar of Preid.t
   | DTconst of constant
   | DTapp of lsymbol * dterm list
+  | DTrecord of (lsymbol * dterm) list
   | DTif of dterm * dterm * dterm
   | DTlet of Preid.t * dterm * dterm
   | DTcase of dterm * (dpattern * dterm option * dterm) list

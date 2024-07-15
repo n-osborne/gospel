@@ -114,6 +114,7 @@ and dterm_node =
   | DTvar of Preid.t
   | DTconst of constant
   | DTapp of lsymbol * dterm list
+  | DTrecord of (lsymbol * dterm) list
   | DTif of dterm * dterm * dterm
   | DTlet of Preid.t * dterm * dterm
   | DTcase of dterm * (dpattern * dterm option * dterm) list
@@ -350,6 +351,10 @@ and term_node ~loc env dty dterm_node =
         (List.map (term env) dtl)
         (Option.fold ~some:ty_of_dty ~none:ty_bool dty)
         loc
+  | DTrecord rd ->
+      let rd = List.map (fun (ls, dt) -> (ls, term env dt)) rd in
+      let tn = Trecord rd in
+      mk_term tn (Option.fold ~some:ty_of_dty ~none:ty_bool dty) loc
   | DTif (dt1, dt2, dt3) ->
       t_if (term env dt1) (term env dt2) (term env dt3) loc
   | DTlet (pid, dt1, dt2) ->
