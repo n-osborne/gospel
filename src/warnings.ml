@@ -21,6 +21,7 @@ type kind =
   | Functor_application of string
   | Illegal_character of char
   | Illegal_escape of string * string option
+  | Inlined_record_expected
   | Invalid_coercion_type of string
   | Invalid_int_literal of string * char option
   | Module_not_found of string
@@ -101,6 +102,8 @@ let pp_kind ppf = function
       pf ppf "Illegal backslash escape in string or character (%s)%a" s
         (option (fmt ": %s"))
         explanation
+  | Inlined_record_expected ->
+      pf ppf "This constructor expects an inlined record argument"
   | Invalid_coercion_type f ->
       pf ppf "The function %s does not have a valid coercion type" f
   | Invalid_int_literal (s, c) ->
