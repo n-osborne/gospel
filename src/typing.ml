@@ -381,6 +381,57 @@ let rec dterm whereami kid crcm ns denv { term_desc; term_loc = loc } : dterm =
       | Constructor_symbol { ls_name; _ } | Function_symbol { ls_name; _ } ->
           W.error ~loc (W.Bad_record_field ls_name.id_str))
   | Uast.Tidapp (q, tl) -> qualid_app q tl
+  (* Inlined records are not supposed to escape the scope of the constructor,
+     so here the left term should be the constructor and the right term a
+     record *)
+  | Uast.Tapply
+      ({ term_desc = Tpreid q; _ }, { term_desc = Trecord fields_right; _ })
+    -> (
+      match find_q_ls ns q with
+      | Constructor_symbol
+          { ls_name; ls_args = Cstr_record fields_left; ls_value } as ls ->
+          let dtyl, dty =
+            (* we already know that it is a constructor symbol *)
+            specialize_ls ls
+          in
+          let fields_left =
+            List.map2 (fun (id, _) dty -> (id, dty)) fields_left dtyl
+          in
+          let get_pid_str = function
+            | Qpreid pid | Qdot (_, pid) -> pid.pid_str
+          in
+          (* normalise order of the fields as the user can provide them in any
+             order *)
+          let sorted_left =
+            let cmp (l, _) (r, _) =
+              let open Ident in
+              String.compare l.id_str r.id_str
+            in
+            List.sort cmp fields_left
+          and sorted_right =
+            let cmp (l, _) (r, _) =
+              String.compare (get_pid_str l) (get_pid_str r)
+            in
+            List.sort cmp fields_right
+          in
+          let aux (id, dty) (q, t) =
+            let field_str = get_pid_str q in
+            if String.equal id.Ident.id_str field_str then
+              let dt = dterm whereami kid crcm ns denv t in
+              dterm_expected crcm dt dty
+            else
+              let constr_str =
+                Fmt.(str "%a.%a" print_ty ls_value Ident.pp_simpl ls_name)
+              in
+              W.error ~loc (W.Wrong_name (field_str, constr_str))
+          in
+          let dts = List.map2 aux sorted_left sorted_right in
+          mk_dterm ~loc (DTapp (ls, dts)) dty
+      | Constructor_symbol { ls_name = _; ls_args = Cstr_tuple _; _ } ->
+          assert false
+      | Function_symbol _ -> assert false
+      | Field_symbol { ls_name; _ } ->
+          W.error ~loc (W.Field_application ls_name.id_str))
   | Uast.Tapply (t1, t2) -> unfold_app t1 t2 []
   | Uast.Tnot t ->
       let dt = dterm whereami kid crcm ns denv t in
