@@ -338,6 +338,27 @@
  (deps
   %{bin:gospel}
   (:checker %{project_root}/test/utils/testchecker.exe))
+ (targets incomplete_record.gospel)
+ (action
+  (with-outputs-to incomplete_record.mli.output
+   (run %{checker} %{dep:incomplete_record.mli}))))
+
+(rule
+ (alias runtest)
+ (action
+  (diff incomplete_record.mli incomplete_record.mli.output)))
+
+(rule
+ (alias test-cmis)
+ (action
+  (chdir %{project_root}
+   ; Syntax sanity check
+   (run ocamlc -c %{dep:incomplete_record.mli}))))
+
+(rule
+ (deps
+  %{bin:gospel}
+  (:checker %{project_root}/test/utils/testchecker.exe))
  (targets int_not_bool1.gospel)
  (action
   (with-outputs-to int_not_bool1.mli.output
