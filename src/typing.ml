@@ -525,19 +525,19 @@ let rec dterm whereami kid crcm ns denv { term_desc; term_loc = loc } : dterm =
       | _ ->
           let dt = dterm whereami kid crcm ns denv t in
           mk_dterm ~loc (DTold dt) (Option.get dt.dt_dty))
-  | Uast.Trecord qtl ->
+  | Uast.Trecord qtl -> (
       let cs, pjl, fll = parse_record ~loc kid ns qtl in
       let dtyl, dty = specialize_ls cs in
-      let aux ls dty =
-        let dt =
-          try dterm whereami kid crcm ns denv (Mls.find ls fll)
-          with Not_found ->
-            W.error ~loc (W.Unknown_record_field (get_name ls).id_str)
-        in
-        (ls, dterm_expected crcm dt dty)
+      let aux (fields, missing) ls dty =
+        match Mls.find_opt ls fll with
+        | Some t ->
+            let dt = dterm whereami kid crcm ns denv t in
+            ((ls, dterm_expected crcm dt dty) :: fields, missing)
+        | None -> (fields, (get_name ls).id_str :: missing)
       in
-      let xs = List.map2 aux pjl dtyl in
-      mk_dterm ~loc (DTrecord xs) dty
+      match List.fold_left2 aux ([], []) pjl dtyl with
+      | fields, [] -> mk_dterm ~loc (DTrecord fields) dty
+      | _, missing -> W.error ~loc (W.Label_missing missing))
   | Uast.Tupdate (t, qtl) ->
       let cs, pjl, fll = parse_record ~loc kid ns qtl in
       let get_term pj =
