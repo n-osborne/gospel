@@ -17,11 +17,11 @@ let test test =
   let parse s =
     match Sys.file_exists s with
     | true ->
-        if test s then `Ok s
-        else `Error (Printf.sprintf "don't know what to do with %s" s)
-    | false -> `Error (Printf.sprintf "Error: `%s' not found" s)
+        if test s then Ok s
+        else Error (`Msg (Printf.sprintf "don't know what to do with %s" s))
+    | false -> Error (`Msg (Printf.sprintf "Error: `%s' not found" s))
   in
-  (parse, Format.pp_print_string)
+  Arg.conv (parse, Format.pp_print_string)
 
 let test_intf = test intf
 let test_file = test file
