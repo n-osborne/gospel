@@ -14,4 +14,4 @@
 (executable
  (name checklib)
  (modules checklib)
- (libraries gospel_checker))
+ (libraries gospel.checker))
