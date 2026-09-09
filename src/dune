@@ -7,7 +7,8 @@
   (-v --explain)))
 
 (library
- (public_name gospel_checker)
+ (name checker)
+ (public_name gospel.checker)
  (preprocess
   (pps ppx_deriving.show))
  (libraries

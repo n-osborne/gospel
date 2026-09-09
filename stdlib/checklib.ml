@@ -8,7 +8,7 @@
 (*  (as described in file LICENSE enclosed).                              *)
 (**************************************************************************)
 
-open Gospel_checker
+open Checker
 
 module W = Warnings
 (** Simple script to type check the Gospel and OCaml standard library and
