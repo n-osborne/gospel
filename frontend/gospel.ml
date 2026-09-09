@@ -92,7 +92,7 @@ let rec check ~verbose tasts env = function
       in
       check ~verbose tasts (Namespace.add_mod env id mods) t
 
-let tast ~verbose files =
+let typecheck ~verbose files =
   errors files;
   (* Create the compilation directory if it does not already exist. *)
   if not (Sys.file_exists comp_dir) then

@@ -10,5 +10,5 @@
 open Gospel
 
 let run verbose files =
-  let _ = tast ~verbose files in
+  let _ = typecheck ~verbose files in
   ()
