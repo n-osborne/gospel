@@ -8,7 +8,7 @@
 (*  (as described in file LICENSE enclosed).                              *)
 (**************************************************************************)
 
-open Checker
+open Gospel_libs
 
 type 'a file = { fname : string; fmodule : string; fdefs : 'a }
 

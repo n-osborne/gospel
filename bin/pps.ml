@@ -16,7 +16,7 @@ let run_file file =
     let ic = open_in file in
     let lexbuf = Lexing.from_channel ic in
     Lexing.set_filename lexbuf file;
-    Fmt.pr "@[%a@]\n" Checker.Pps.run lexbuf;
+    Fmt.pr "@[%a@]\n" Gospel_libs.Pps.run lexbuf;
     close_in ic)
   else
     let ic = open_in file in

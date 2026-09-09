@@ -8,7 +8,7 @@
 (*  (as described in file LICENSE enclosed).                              *)
 (**************************************************************************)
 
-open Checker
+open Gospel_libs
 open Bin_utils
 module W = Warnings
 
