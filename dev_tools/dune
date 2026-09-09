@@ -1,6 +1,6 @@
 (library
  (public_name gospel)
- (libraries gospel.checker ppx_blob)
+ (libraries gospel.typecheckerlibs ppx_blob)
  (preprocess
   (pps ppx_blob))
  (preprocessor_deps
