@@ -2,6 +2,8 @@
 
 ## Added
 
+- Fix packaging by making typecheker library a sub-package
+  [\#496](https://github.com/ocaml-gospel/gospel/pull/496)
 - Add failing test case about map
   [\#480](https://github.com/ocaml-gospel/gospel/pull/480)
 - Add `Option.{get,is_none,is_some}` in Gospel stdlib
