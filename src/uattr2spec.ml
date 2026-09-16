@@ -164,28 +164,30 @@ let rec signature_item_desc ~filename = function
   | Psig_value v ->
       let v = val_description ~filename v in
       Some (Sig_val v)
-  | Psig_type (_, tl) ->
-      let* tl = map_option (type_declaration ~filename) tl in
-      Sig_type tl
+  | Psig_type (_, tl) as s ->
+      (match map_option (type_declaration ~filename) tl with
+      | None -> Some (Sig_unsupported s)
+      | Some tl -> Some (Sig_type tl))
   | Psig_attribute a ->
       if not (is_spec a) then Some (Sig_attribute a)
       else Some (floating_spec ~filename a)
-  | Psig_module m ->
-      let* decl = module_declaration ~filename m in
-      Sig_module decl
+  | Psig_module m as s -> (
+      match module_declaration ~filename m with
+      | None -> Some (Sig_unsupported s)
+      | Some decl -> Some (Sig_module decl))
   | Psig_exception e -> Some (Sig_exception (sig_exception e))
   (* Unsupported *)
-  | Psig_recmodule _ -> None
-  | Psig_modtype _ -> None
-  | Psig_typext _ -> None
-  | Psig_open _ -> None
-  | Psig_include _ -> None
-  | Psig_class _ -> None
-  | Psig_class_type _ -> None
-  | Psig_extension _ -> None
-  | Psig_typesubst _ -> None
-  | Psig_modsubst _ -> None
-  | Psig_modtypesubst _ -> None
+  | Psig_recmodule _ as s -> Some (Sig_unsupported s)
+  | Psig_modtype _ as s -> Some (Sig_unsupported s)
+  | Psig_typext _ as s -> Some (Sig_unsupported s)
+  | Psig_open _ as s -> Some (Sig_unsupported s)
+  | Psig_include _ as s -> Some (Sig_unsupported s)
+  | Psig_class _ as s -> Some (Sig_unsupported s)
+  | Psig_class_type _ as s -> Some (Sig_unsupported s)
+  | Psig_extension _ as s -> Some (Sig_unsupported s)
+  | Psig_typesubst _ as s -> Some (Sig_unsupported s)
+  | Psig_modsubst _ as s -> Some (Sig_unsupported s)
+  | Psig_modtypesubst _ as s -> Some (Sig_unsupported s)
 
 and signature ~filename sigs =
   List.filter_map
