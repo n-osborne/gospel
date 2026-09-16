@@ -214,6 +214,8 @@ type s_signature_item_desc =
   | Sig_attribute of attribute
   (* [@@@id] *)
   | Sig_gospel of gospel_signature * string
+  (* unsupported OCaml signature item *)
+  | Sig_unsupported of signature_item_desc
 
 and s_signature_item = { sdesc : s_signature_item_desc; sloc : Location.t }
 and s_signature = s_signature_item list
