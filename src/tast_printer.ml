@@ -299,6 +299,7 @@ let rec signature_item fmt x =
   | Sig_ghost_open q -> mod_open fmt q
   | Sig_attribute _ -> string fmt "[@@@ attribute]"
   | Sig_unsupported _ -> failwith "niy"
+  | Sig_unsupported_parsed _ -> failwith "niy"
 
 and module_decl fmt m =
   let (Mod_signature l) = m.mdtype.mdesc in

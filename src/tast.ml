@@ -174,6 +174,7 @@ and s_signature_item_desc =
   | Sig_exception of Id_uast.exception_decl
   | Sig_attribute of Ppxlib.attribute
   | Sig_unsupported of Ppxlib.signature_item_desc
+  | Sig_unsupported_parsed of Parse_uast.s_signature_item_desc
 
 and s_signature_item = { sdesc : s_signature_item_desc; sloc : Location.t }
 and s_signature = s_signature_item list
