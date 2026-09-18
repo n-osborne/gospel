@@ -115,6 +115,9 @@ let get_local_type ~ocaml id env =
 let unique_pty ~ocaml ~bind defs env pty =
   let rec unique_pty = function
     | Parse_uast.PTtyvar pid -> PTtyvar (Hashtbl.find env.type_vars pid.pid_str)
+    | PTtyapp (q, _) when ocaml && Namespace.is_unsupported_ocaml_type defs q ->
+        let loc = Parse_uast.get_qualid_loc q in
+        W.unsupported ~loc (Fmt.str "%a" Uast_printer.qualid q)
     | PTtyapp (Qid id, l) when is_local_type ~ocaml id env ->
         (* This branch is reached when we are processing a set of recursive type
           definitions and [id] is one of the type names. *)
