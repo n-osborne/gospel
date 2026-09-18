@@ -54,16 +54,18 @@ let parse_gospel ~filename parse attr =
     in
     W.error ~loc W.Syntax_error
 
+exception OCaml_unsupported
+
 let params_to_id =
   let param_to_id (core_type, _) =
     let loc = core_type.ptyp_loc in
     match core_type.ptyp_desc with
-    | Ptyp_var s -> Some (Preid.create s ~loc)
-    | Ptyp_any -> None
+    | Ptyp_var s -> Preid.create s ~loc
+    | Ptyp_any -> raise OCaml_unsupported
     | _ -> assert false
     (* There are no other possible values for type parameters in type declarations *)
   in
-  map_option param_to_id
+  List.map param_to_id
 
 let preid_of_loc s = Preid.create ~loc:s.loc s.txt
 
@@ -82,7 +84,7 @@ let rec core_to_pty cty =
       PTtyapp (preid_of_long id.loc id.txt, List.map core_to_pty l)
   | Ptyp_arrow (_, t1, t2) -> PTarrow (core_to_pty t1, core_to_pty t2)
   | Ptyp_tuple l -> PTtuple (List.map core_to_pty l)
-  | _ -> assert false (* TODO replace with unsupported*)
+  | _ -> raise OCaml_unsupported
 
 let ptype_kind = function
   | Ptype_abstract -> PTtype_abstract
@@ -99,14 +101,14 @@ let ptype_kind = function
         }
       in
       PTtype_record (List.map to_gospel_label l)
-  | _ -> assert false
+  | _ -> raise OCaml_unsupported
 
-let mk_tdecl t attrs spec =
-  let* tparams = params_to_id t.ptype_params in
+let mk_tdecl t tkind attrs spec =
+  let tparams = params_to_id t.ptype_params in
   {
     tname = preid_of_loc t.ptype_name;
     tparams;
-    tkind = ptype_kind t.ptype_kind;
+    tkind;
     tmanifest = Option.map core_to_pty t.ptype_manifest;
     tattributes = attrs;
     tspec = spec;
@@ -114,14 +116,15 @@ let mk_tdecl t attrs spec =
   }
 
 let type_declaration ~filename t =
-  let spec_attr, other_attrs = get_spec_attr t.ptype_attributes in
+  let spec_attr, other_attrs = get_spec_attr t.ptype_attributes
+  and tkind = ptype_kind t.ptype_kind in
   let parse attr =
     let ty_text, spec = parse_gospel ~filename Uparser.type_spec attr in
     let ty_loc = get_spec_loc attr in
     { spec with ty_text; ty_loc }
   in
   let spec = Option.map parse spec_attr in
-  mk_tdecl t other_attrs spec
+  mk_tdecl t tkind other_attrs spec
 
 let val_description ~filename v =
   let spec_attr, other_attrs = get_spec_attr v.pval_attributes in
@@ -161,20 +164,21 @@ let sig_exception exn =
     or is an OCaml value declaration without a specification, we return [None].
 *)
 let rec signature_item_desc ~filename = function
-  | Psig_value v ->
-      let v = val_description ~filename v in
-      Sig_val v
+  | Psig_value v as s -> (
+      try Sig_val (val_description ~filename v)
+      with OCaml_unsupported -> Sig_unsupported s)
   | Psig_type (_, tl) as s -> (
-      match map_option (type_declaration ~filename) tl with
-      | None -> Sig_unsupported s
-      | Some tl -> Sig_type tl)
+      try Sig_type (List.map (type_declaration ~filename) tl)
+      with OCaml_unsupported -> Sig_unsupported s)
   | Psig_attribute a ->
       if not (is_spec a) then Sig_attribute a else floating_spec ~filename a
   | Psig_module m as s -> (
       match module_declaration ~filename m with
       | None -> Sig_unsupported s
       | Some decl -> Sig_module decl)
-  | Psig_exception e -> Sig_exception (sig_exception e)
+  | Psig_exception e as s -> (
+      try Sig_exception (sig_exception e)
+      with OCaml_unsupported -> Sig_unsupported s)
   (* Unsupported *)
   | Psig_recmodule _ as s -> Sig_unsupported s
   | Psig_modtype _ as s -> Sig_unsupported s
