@@ -1356,7 +1356,11 @@ and signature s env =
   let sdesc, env =
     match s.Parse_uast.sdesc with
     | Sig_gospel (s, _) -> gospel_sig env s
-    | Sig_val v -> ocaml_val env v
+    | Sig_val v as s -> (
+        try ocaml_val env v with
+        | W.Error (_, Unsupported _) when Option.is_none v.Parse_uast.vspec ->
+            (Sig_unsupported_parsed s, env)
+        | e -> raise e)
     | Sig_type t ->
         let env, t = tdecl_list ~ocaml:true env t in
         (Tast.Sig_type t, env)
