@@ -143,6 +143,10 @@ val get_exn_info :
 (** [get_exn_info defs id] receives an exception identifier [id] and the types
     of its arguments. *)
 
+val get_fun_ident : mod_defs -> Parse_uast.qualid -> Ident.t
+(** [get_fun_ident defs q] returns the unique identifier for the function
+    corresponding to [q] *)
+
 val access_mod : mod_defs -> Parse_uast.qualid -> Id_uast.qualid * mod_defs
 (** [access_mod defs id] returns the resolved name and the namespace
     corresponding to the given module name *)

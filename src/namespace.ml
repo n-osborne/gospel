@@ -348,6 +348,10 @@ end)
 
 let fun_info = Lookup_fun.unique_toplevel_qualid
 
+let get_fun_ident env id =
+  let _, info = fun_info env id in
+  info.fid
+
 module Lookup_val = Lookup (struct
   type info = fun_info
 
