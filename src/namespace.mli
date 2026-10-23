@@ -143,6 +143,10 @@ val get_exn_info :
 (** [get_exn_info defs id] receives an exception identifier [id] and the types
     of its arguments. *)
 
+val access_mod : mod_defs -> Parse_uast.qualid -> Id_uast.qualid * mod_defs
+(** [access_mod defs id] returns the resolved name and the namespace
+    corresponding to the given module name *)
+
 val gospel_open : env -> Parse_uast.qualid -> Id_uast.qualid * env
 (** [gospel_open defs id] adds the definitions in module [id] into the scope
     [defs]. *)
