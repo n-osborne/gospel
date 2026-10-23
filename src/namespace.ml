@@ -144,6 +144,9 @@ let empty_defs =
     mod_env = Env.empty;
   }
 
+let get_fun_env env = env.fun_env
+let get_type_env env = env.type_env
+let get_mod_env env = env.mod_env
 (* -------------------------------------------------------------------------- *)
 
 (* The following section defines a functor [Lookup] for finding names in a

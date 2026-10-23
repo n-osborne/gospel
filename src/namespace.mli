@@ -11,6 +11,8 @@
 (** This module provides operations to keep track of all names defined in the
     top level. *)
 
+module Env : Map.S with type key = string
+
 exception Unsupported_signature of Parse_uast.qualid
 (** Signals that the identifier being searched is some construct that Gospel
     does not support. This exception may be raised by any function that looks up
@@ -23,6 +25,46 @@ type env
 type mod_defs
 (** A set of top level definitions *)
 
+type fun_info = {
+  fid : Ident.t;
+  (* The unique identifier for this function. *)
+  fparams : Ident.t list;
+  (* All the type variables used in [fty]. *)
+  fty : Id_uast.pty; (* The function's type. *)
+}
+
+val get_fun_env : mod_defs -> fun_info Env.t
+
+type ty_info = {
+  tid : Ident.t; (* The unique identifier for the type *)
+  tparams : Ident.t list;
+  (* The type variables this type takes as argument. We need to know the names
+     of each parameter so that when we expand this type's alias, we know how to
+     replace its type variables. e.g:
+
+     [type ('a, 'b) t = 'a -> 'b]
+     [function x : (int, string) t].
+
+     When typechecking we replace [t] with its alias where every ['a]
+     is replaced with [int] and ['b] is replaced with [string],
+     resulting in the expanded type [int -> string]. *)
+  tmut : bool;
+  (* Mutability flag.  Always [false] for Gospel types. *)
+  talias : Id_uast.pty option;
+      (* In case of a type declaration of the form [type t = alias] where alias is
+     some type expression, this value is [Some alias]. All applications of type
+     [tid] are replaced with [talias] during typechecking.
+
+     The [talias] field always points to the "top most" alias. This means if we
+     have the following program [type t1 type t2 = t1 type t3 = t2] the [talias]
+     field for [t3] will be [t1].*)
+  tmodel : Id_uast.pty option;
+      (* The logical representation for the type.  [None] if the type
+      has no model or is a Gospel type. *)
+}
+
+val get_type_env : mod_defs -> ty_info Env.t
+
 val scope : env -> mod_defs
 (** Gets the set of definitions in scope *)
 
@@ -33,6 +75,8 @@ val defs : env -> mod_defs
 (* Records containing the information necessary regarding each top level
     definitions *)
 type mod_info = { mid : Ident.t; mdefs : mod_defs }
+
+val get_mod_env : mod_defs -> mod_info Env.t
 
 type record_info = {
   rid : Ident.t; (* The name of the record type. *)
