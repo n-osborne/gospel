@@ -260,6 +260,10 @@ end)
 
 let gospel_type_info = Lookup_gospel_type.unique_toplevel_qualid
 
+let get_gospel_type_ident defs q =
+  let _, info = gospel_type_info defs q in
+  info.tid
+
 module Lookup_ocaml_type = Lookup (struct
   type info = ty_info
 
