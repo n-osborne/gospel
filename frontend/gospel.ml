@@ -70,7 +70,7 @@ let path2module p =
   Filename.basename p |> Filename.chop_extension |> String.capitalize_ascii
 
 let rec check ~verbose tasts env = function
-  | [] -> tasts
+  | [] -> env, tasts
   | file :: t ->
       (* Precondition: this file must have extension [.gospel] or be a valid
          Gospel interface file. *)
