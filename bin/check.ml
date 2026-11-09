@@ -9,6 +9,9 @@
 (**************************************************************************)
 open Gospel
 
-let run verbose files =
-  let _ = typecheck ~verbose files in
+let run dumpast verbose files =
+  let _, files = typecheck ~verbose files in
+  let tast = (List.hd files).fdefs in
+  if dumpast then
+    Fmt.pf Fmt.stdout "%a@\n" Gospel_typecheckerlibs.Tast.pp_s_signature tast;
   ()

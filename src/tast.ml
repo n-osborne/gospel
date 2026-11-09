@@ -10,21 +10,26 @@
 
 open Types
 
-type tvar = Ident.t
+type tvar = Ident.t [@@deriving show]
 
-type tsymbol = { ts_id : Ident.t; ts_ty : Types.ty }
+type tsymbol = { ts_id : Ident.t; ts_ty : Types.ty } [@@deriving show]
 (** Typed variables *)
 
 (** Typed variables *)
 let mk_ts ts_id ts_ty = { ts_id; ts_ty }
 
-type pat = { pat_desc : pat_desc; pat_loc : Location.t }
+type pat = {
+  pat_desc : pat_desc;
+  pat_loc : Location.t; [@printer Utils.Fmt.pp_loc]
+}
+[@@deriving show]
 
 and pat_desc =
   | Pwild
   | Pid of tsymbol
   | Ptuple of pat list
   | Pcast of pat * Types.ty
+[@@deriving show]
 
 (** Typed terms *)
 type term_node =
@@ -48,8 +53,14 @@ type term_node =
   | Tcast of term * Id_uast.pty
   | Tscope of Id_uast.qualid * term
   | Told of term
+[@@deriving show]
 
-and term = { t_node : term_node; t_ty : ty; t_loc : Location.t }
+and term = {
+  t_node : term_node;
+  t_ty : ty;
+  t_loc : Location.t; [@printer Utils.Fmt.pp_loc]
+}
+[@@deriving show]
 
 let mk_term t_node t_ty t_loc = { t_node; t_ty; t_loc }
 
@@ -59,10 +70,11 @@ type axiom = {
   ax_name : Ident.t;  (** Name *)
   ax_term : term;  (** Definition *)
   ax_tvars : tvar list;  (** Type variables *)
-  ax_loc : Location.t;  (** Location *)
+  ax_loc : Location.t; [@printer Utils.Fmt.pp_loc]  (** Location *)
   ax_text : string;
       (** String containing the original specificaion as written by the user *)
 }
+[@@deriving show]
 
 type fun_spec = {
   fun_req : term list;  (** Preconditions *)
@@ -70,8 +82,10 @@ type fun_spec = {
   fun_variant : term list;  (** Variant *)
   fun_text : string;
       (** String containing the original specificaion as written by the user *)
-  fun_loc : Location.t;  (** Specification location *)
+  fun_loc : Location.t; [@printer Utils.Fmt.pp_loc]
+      (** Specification location *)
 }
+[@@deriving show]
 
 type function_ = {
   fun_name : Ident.t;  (** Function symbol *)
@@ -81,16 +95,18 @@ type function_ = {
   fun_ret : ty;
   fun_def : term option;  (** Definition *)
   fun_spec : fun_spec;  (** Specification *)
-  fun_loc : Location.t;  (** Location *)
+  fun_loc : Location.t; [@printer Utils.Fmt.pp_loc]  (** Location *)
 }
+[@@deriving show]
 
 type type_spec = {
   ty_mutable : bool;
   ty_invariant : (Id_uast.id * term list) option;
   ty_model : Id_uast.model;
   ty_text : string;
-  ty_loc : Location.t;
+  ty_loc : Location.t; [@printer Utils.Fmt.pp_loc]
 }
+[@@deriving show]
 
 let mk_type_spec ty_mutable ty_invariant ty_model ty_text ty_loc =
   { ty_mutable; ty_invariant; ty_model; ty_text; ty_loc }
@@ -102,12 +118,13 @@ type s_type_declaration = {
   tparams : tvar list;
   tkind : Id_uast.type_kind;
   tmanifest : Id_uast.pty option;
-  tattributes : Ppxlib.attributes;
+  tattributes : Ppxlib.attributes; [@opaque]
   (* ... [@@id1] [@@id2] *)
   tspec : type_spec;
   (* specification *)
-  tloc : Location.t;
+  tloc : Location.t; [@printer Utils.Fmt.pp_loc]
 }
+[@@deriving show]
 
 let mk_tdecl tname tparams tkind tmanifest tattributes tspec tloc =
   { tname; tparams; tkind; tmanifest; tattributes; tspec; tloc }
@@ -118,8 +135,9 @@ type xpost_spec = {
   sp_xrets : Id_uast.sp_var list;
   sp_xtops : Id_uast.ocaml_sp_var list;
   sp_xpost : term list;
-  sp_xloc : Location.t;
+  sp_xloc : Location.t; [@printer Utils.Fmt.pp_loc]
 }
+[@@deriving show]
 
 type val_spec = {
   sp_args : Id_uast.sp_var list;
@@ -132,36 +150,40 @@ type val_spec = {
   sp_diverge : bool;
   sp_pure : bool;
   sp_text : string;
-  sp_loc : Location.t;
+  sp_loc : Location.t; [@printer Utils.Fmt.pp_loc]
 }
+[@@deriving show]
 
 type s_val_description = {
   vname : Ident.t;
   vtype : ty;
   vtvars : tvar list;
   (* OCaml type of the value *)
-  vattributes : Ppxlib.attributes;
+  vattributes : Ppxlib.attributes; [@opaque]
   (* ... [@@id1] [@@id2] *)
   vspec : val_spec option;
   (* specification *)
-  vloc : Location.t;
+  vloc : Location.t; [@printer Utils.Fmt.pp_loc]
 }
+[@@deriving show]
 
-type s_module_type_desc = Mod_signature of s_signature
+type s_module_type_desc = Mod_signature of s_signature [@@deriving show]
 
 and s_module_declaration = {
   mdname : Ident.t;
   mdtype : s_module_type;
-  mdattributes : Ppxlib.attributes;
+  mdattributes : Ppxlib.attributes; [@opaque]
   (* ... [@@id1] [@@id2] *)
-  mdloc : Location.t;
+  mdloc : Location.t; [@printer Utils.Fmt.pp_loc]
 }
+[@@deriving show]
 
 and s_module_type = {
   mdesc : s_module_type_desc;
-  mloc : Location.t;
-  mattributes : Ppxlib.attributes; (* ... [@id1] [@id2] *)
+  mloc : Location.t; [@printer Utils.Fmt.pp_loc]
+  mattributes : Ppxlib.attributes; [@opaque] (* ... [@id1] [@id2] *)
 }
+[@@deriving show]
 
 and s_signature_item_desc =
   | Sig_value of s_val_description
@@ -173,11 +195,20 @@ and s_signature_item_desc =
   | Sig_ghost_open of Id_uast.qualid
   | Sig_exception of Id_uast.exception_decl
   | Sig_attribute of Ppxlib.attribute
+      [@printer fun fmt _ -> fprintf fmt "<opaque>"]
   | Sig_unsupported of Ppxlib.signature_item_desc
+      [@printer fun fmt _ -> fprintf fmt "<unsupported>"]
   | Sig_unsupported_parsed of Parse_uast.s_signature_item_desc
+      [@printer fun fmt _ -> fprintf fmt "<unsupported>"]
+[@@deriving show]
 
-and s_signature_item = { sdesc : s_signature_item_desc; sloc : Location.t }
-and s_signature = s_signature_item list
+and s_signature_item = {
+  sdesc : s_signature_item_desc;
+  sloc : Location.t; [@printer Utils.Fmt.pp_loc]
+}
+[@@deriving show]
+
+and s_signature = s_signature_item list [@@deriving show]
 
 (* Helper functions *)
 

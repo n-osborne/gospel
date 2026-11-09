@@ -5,4 +5,4 @@
  (name cli)
  (public_name gospel)
  (package gospel)
- (libraries cmdliner dune-build-info gospel))
+ (libraries cmdliner fmt dune-build-info gospel))

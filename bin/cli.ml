@@ -38,10 +38,14 @@ let verbose =
   let doc = "Print all intermediate forms." in
   Arg.(value & flag & info [ "v"; "verbose" ] ~doc)
 
+let dumpast =
+  let doc = "Print typed ast on stdout." in
+  Arg.(value & flag & info [ "d"; "dumpast" ] ~doc)
+
 let tc =
   let doc = "Gospel type-checker." in
   let info = Cmd.info "check" ~doc in
-  let term = Term.(const Check.run $ verbose $ intfs) in
+  let term = Term.(const Check.run $ dumpast $ verbose $ intfs) in
   Cmd.v info term
 
 let pps =

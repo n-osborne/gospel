@@ -47,4 +47,5 @@ depends: [
   "odoc" {with-test}
   "inferno" {>= "20220603"}
   "ppx_blob" {>= "0.9.0"}
+  "ppx_deriving"
 ]

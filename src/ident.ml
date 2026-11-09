@@ -17,7 +17,7 @@ let primitive_project = "##PRIMITIVES##"
 let stdlib_project = "##STDLIB##"
 
 module type ID = sig
-  type t
+  type t [@@deriving show]
 
   val equal : t -> t -> bool
   val hash : t -> int
@@ -32,7 +32,7 @@ end
     to guarantee that there will not be collisions with integers that we
     generate for other files. *)
 module Tag : ID = struct
-  type t = { id : int; project : string }
+  type t = { id : int; project : string } [@@deriving show]
   (** Invariant : two identifiers belong to the same [project] , they cannot
       have the same integer identifier. *)
 
@@ -55,9 +55,10 @@ type t = {
   id_str : string;
   id_fixity : Preid.fixity;
   id_attrs : string list;
-  id_loc : Location.t;
+  id_loc : Location.t; [@printer Utils.Fmt.pp_loc]
   id_tag : Tag.t;
 }
+[@@deriving show]
 
 let pp ppf id =
   match id.id_fixity with

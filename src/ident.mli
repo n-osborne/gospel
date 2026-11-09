@@ -42,11 +42,12 @@ type t = {
   id_str : string; (* Variable name. Not used internally. *)
   id_fixity : Preid.fixity;
   id_attrs : string list; (* Variable attributes *)
-  id_loc : Location.t;
+  id_loc : Location.t; [@printer Utils.Fmt.pp_loc]
   id_tag : Tag.t;
       (* Unique identifier. During typechecking, this is what
        Inferno uses to check if two variables are the same. *)
 }
+[@@deriving show]
 
 val pp : Format.formatter -> t -> unit
 

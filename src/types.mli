@@ -9,7 +9,7 @@
 (**************************************************************************)
 
 (* Definitions necessary for Inferno. Should not be used directly *)
-type ty = Id_uast.pty
+type ty = Id_uast.pty [@@deriving show]
 type tyvar
 type 'a structure = 'a Structure.structure
 

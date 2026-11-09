@@ -9,17 +9,18 @@
 (**************************************************************************)
 
 (* Types *)
-type id = Ident.t
+type id = Ident.t [@@deriving show]
 
 open Ppxlib
 
-type qualid = Qid of id | Qdot of qualid * id
+type qualid = Qid of id | Qdot of qualid * id [@@deriving show]
 
 type pty =
   | PTtyvar of id
   | PTtyapp of app_info * pty list
   | PTtuple of pty list
   | PTarrow of pty * pty
+[@@deriving show]
 
 and app_info = {
   app_qid : qualid;
@@ -98,12 +99,14 @@ type ocaml_sp_var = {
            Remark: If this [sp_var] value refers to a return
            value, [ro] is [true]. *)
 }
+[@@deriving show]
 
 type sp_var =
   | Wildcard
   | Unit
   | Ghost of id * pty (* Ghost variable *)
   | OCaml of ocaml_sp_var
+[@@deriving show]
 
 type xpost_spec = {
   sp_exn : qualid;
@@ -129,6 +132,7 @@ type val_spec = {
 }
 
 type model = No_model | Implicit of pty | Fields of (id * pty) list
+[@@deriving show]
 
 type type_spec = {
   ty_ephemeral : bool;
@@ -174,6 +178,7 @@ type label_declaration = {
 }
 
 type type_kind = PTtype_abstract | PTtype_record of label_declaration list
+[@@deriving show]
 
 type s_type_declaration = {
   tname : id;
@@ -196,9 +201,10 @@ type gospel_signature =
 type exception_decl = {
   exn_id : id;
   exn_args : pty list;
-  exn_loc : Location.t;
-  exn_attributes : attributes;
+  exn_loc : Location.t; [@printer Utils.Fmt.pp_loc]
+  exn_attributes : attributes; [@opaque]
 }
+[@@deriving show]
 
 type s_signature_item_desc =
   | Sig_type of rec_flag * s_type_declaration list

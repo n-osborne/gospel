@@ -37,13 +37,14 @@ type pat = { pat_desc : pat_desc; pat_loc : Location.t }
 and pat_desc = Pwild | Pid of id | Ptuple of pat list | Pcast of pat * pty
 
 type param = id * pty
-type quant = Tforall | Texists
+type quant = Tforall | Texists [@@deriving show]
 
 type constant =
   | Pconst_integer of string * char option
   | Pconst_char of char
-  | Pconst_string of string * Location.t
+  | Pconst_string of string * (Location.t[@printer Utils.Fmt.pp_loc])
   | Pconst_float of string
+[@@deriving show]
 
 type term = { term_desc : term_desc; term_loc : Location.t }
 
@@ -162,7 +163,7 @@ type s_val_description = {
   vloc : Location.t;
 }
 
-type mutable_flag = Mutable | Immutable
+type mutable_flag = Mutable | Immutable [@@deriving show]
 
 type label_declaration = {
   pld_name : id;
